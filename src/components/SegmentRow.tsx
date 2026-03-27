@@ -95,7 +95,7 @@ export default function SegmentRow({ segment, index, canDelete, onChange, onDele
             border: 'none',
             outline: 'none',
             color: C.text,
-            fontSize: 13,
+            fontSize: 16,
             fontWeight: 500,
             fontFamily: 'inherit',
             padding: '4px 0',
