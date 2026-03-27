@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useMemo, useEffect } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import RoundsPicker from '@/components/RoundsPicker'
 import SegmentRow from '@/components/SegmentRow'
@@ -74,9 +74,6 @@ export default function ConfigClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const presetParam = searchParams.get('preset')
-  const editParam = searchParams.get('edit')
-
   const { workout: passedWorkout, editIndex } = resolveWorkout(searchParams)
   const mode: 'new' | 'edit' | 'preset' = !passedWorkout ? 'new' : editIndex !== null ? 'edit' : 'preset'
 
@@ -96,21 +93,6 @@ export default function ConfigClient() {
     segJson: JSON.stringify(initialSegments),
     rounds: passedWorkout?.rounds ?? 3,
   })
-
-  useEffect(() => {
-    const { workout } = resolveWorkout(searchParams)
-    const segs = workout ? normalizeSegments(workout.segments) : DEFAULT_SEGMENTS
-    setName(workout?.name ?? 'My Workout')
-    setSegments(segs)
-    setRounds(workout?.rounds ?? 3)
-    setSaveChecked(true)
-    origRef.current = {
-      name: workout?.name ?? '',
-      segJson: JSON.stringify(segs),
-      rounds: workout?.rounds ?? 3,
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [presetParam, editParam])
 
   const hasChanges =
     name !== origRef.current.name ||
