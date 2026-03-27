@@ -3,7 +3,7 @@ import ConfigClient from './ConfigClient'
 
 export default function ConfigPage() {
   return (
-    <Suspense fallback={<div style={{ background: '#0F0F0F', minHeight: '100vh' }} />}>
+    <Suspense fallback={<div style={{ background: '#0d1117', minHeight: '100vh' }} />}>
       <ConfigClient />
     </Suspense>
   )
