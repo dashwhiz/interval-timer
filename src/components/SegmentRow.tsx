@@ -80,7 +80,7 @@ export default function SegmentRow({ segment, index, canDelete, onChange, onDele
       }}
     >
       {/* Left: type toggle + label */}
-      <div onClick={toggleType} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div onClick={toggleType} style={{ flex: 1, minWidth: 0, minHeight: 38, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
         <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, color, userSelect: 'none' }}>
           {segment.type === 'work' ? 'WORK' : 'REST'}
         </span>
