@@ -7,22 +7,18 @@ import { useRouter } from 'next/navigation'
 import PresetCard from '@/components/PresetCard'
 import { PRESETS } from '@/lib/presets'
 import { getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts } from '@/lib/storage'
-import { encodeWorkout } from '@/lib/utils'
 import { C } from '@/lib/colors'
-import type { Workout } from '@/lib/types'
 
 export default function HomePage() {
   const router = useRouter()
   const userWorkouts = useSyncExternalStore(subscribeWorkouts, getWorkoutsSnapshot, getWorkoutsServerSnapshot)
 
-  function goToConfig(workout?: Workout, editIndex?: number) {
-    if (workout) {
-      let url = `/config?w=${encodeWorkout(workout)}`
-      if (editIndex !== undefined) url += `&editIndex=${editIndex}`
-      router.push(url)
-    } else {
-      router.push('/config')
-    }
+  function goToEdit(index: number) {
+    router.push(`/config?edit=${index}`)
+  }
+
+  function goToPreset(index: number) {
+    router.push(`/config?preset=${index}`)
   }
 
   return (
@@ -32,7 +28,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
           <GrindLogo />
           <button
-            onClick={() => goToConfig()}
+            onClick={() => router.push('/config')}
             style={{
               width: 40,
               height: 40,
@@ -66,7 +62,7 @@ export default function HomePage() {
                   key={i}
                   workout={w}
                   accentColor={C.green}
-                  onPress={() => goToConfig(w, i)}
+                  onPress={() => goToEdit(i)}
                 />
               ))}
             </WorkoutGrid>
@@ -84,7 +80,7 @@ export default function HomePage() {
                 key={i}
                 workout={w}
                 accentColor={C.orange}
-                onPress={() => goToConfig(w)}
+                onPress={() => goToPreset(i)}
               />
             ))}
           </WorkoutGrid>

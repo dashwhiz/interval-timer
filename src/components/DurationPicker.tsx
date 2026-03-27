@@ -4,7 +4,7 @@ import { formatDuration } from '@/lib/utils'
 import { C } from '@/lib/colors'
 
 interface Props {
-  label: string
+  label?: string
   value: number
   step: number
   min: number
@@ -34,9 +34,11 @@ export default function DurationPicker({ label, value, step, min, max, onChange 
 
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5, marginBottom: 8 }}>
-        {label}
-      </div>
+      {label && (
+        <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5, marginBottom: 8 }}>
+          {label}
+        </div>
+      )}
       <div style={{
         background: C.surface,
         borderRadius: 12,

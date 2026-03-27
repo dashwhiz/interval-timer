@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useTimer } from '@/hooks/useTimer'
 import ConfirmDialog from '@/components/ConfirmDialog'
-import { decodeWorkout, encodeWorkout, formatTime } from '@/lib/utils'
+import { formatTime } from '@/lib/utils'
 import { setThemeColor } from '@/lib/theme-color'
 import { C } from '@/lib/colors'
+import type { Workout } from '@/lib/types'
 
 function PlayIcon({ size }: { size: number }) {
   return (
@@ -50,13 +51,25 @@ function ExitIcon() {
   )
 }
 
+function loadWorkoutFromSession(): Workout | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return JSON.parse(sessionStorage.getItem('grind-workout') ?? 'null')
+  } catch {
+    return null
+  }
+}
+
 export default function TimerClient() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [showQuit, setShowQuit] = useState(false)
 
-  const wParam = searchParams.get('w')
-  const workout = useMemo(() => wParam ? decodeWorkout(wParam) : null, [wParam])
+  const workout = useMemo(() => loadWorkoutFromSession(), [])
+
+  // Redirect home if no workout in session
+  useEffect(() => {
+    if (!workout) router.replace('/')
+  }, [workout, router])
 
   const handleComplete = useCallback((elapsed: number) => {
     setThemeColor(C.bg)
@@ -124,6 +137,8 @@ export default function TimerClient() {
     setShowQuit(false)
     if (status === 'paused') play()
   }
+
+  if (!workout) return null
 
   const textColor = segmentTextColor
   const isLight = textColor === '#000000'

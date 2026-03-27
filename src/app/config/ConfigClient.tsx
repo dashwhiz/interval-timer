@@ -1,16 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import DurationPicker from '@/components/DurationPicker'
 import RoundsPicker from '@/components/RoundsPicker'
+import SegmentRow from '@/components/SegmentRow'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import GrindLogo from '@/components/GrindLogo'
-import { decodeWorkout, encodeWorkout, totalSeconds, formatDuration } from '@/lib/utils'
-import { addWorkout, updateWorkout, deleteWorkout } from '@/lib/storage'
+import type { EditableSegment } from '@/components/SegmentRow'
+import { formatDuration } from '@/lib/utils'
+import { addWorkout, updateWorkout, deleteWorkout, loadWorkouts } from '@/lib/storage'
+import { PRESETS } from '@/lib/presets'
 import { initAudio } from '@/lib/audio'
 import { C } from '@/lib/colors'
-import type { Workout } from '@/lib/types'
+import type { Workout, IntervalSegment } from '@/lib/types'
 
 function TimerIcon() {
   return (
@@ -38,76 +40,93 @@ function DeleteIcon() {
   )
 }
 
-function deriveSimpleParams(workout: Workout) {
-  const workSeg = workout.segments.find(s => s.type === 'work')
-  const restSeg = workout.segments.find(s => s.type === 'rest')
-  return {
-    workSeconds: workSeg?.durationSeconds ?? 30,
-    restSeconds: restSeg?.durationSeconds ?? 0,
-  }
+const DEFAULT_SEGMENTS: EditableSegment[] = [
+  { type: 'work', durationSeconds: 30 },
+  { type: 'rest', durationSeconds: 15 },
+]
+
+function normalizeSegments(segments: IntervalSegment[]): EditableSegment[] {
+  const result = segments
+    .filter(s => s.type !== 'prepare')
+    .map(s => ({ type: s.type as 'work' | 'rest', durationSeconds: s.durationSeconds }))
+  return result.length > 0 ? result : DEFAULT_SEGMENTS
 }
 
-function buildWorkout(name: string, type: Workout['type'], workSeconds: number, restSeconds: number, rounds: number, prepareSeconds: number): Workout {
-  const segments: Workout['segments'] = [{ type: 'work', durationSeconds: workSeconds }]
-  if (restSeconds > 0) segments.push({ type: 'rest', durationSeconds: restSeconds })
-  return { name, type, segments, rounds, prepareSeconds }
+function resolveWorkout(searchParams: URLSearchParams): { workout: Workout | null; editIndex: number | null } {
+  const editParam = searchParams.get('edit')
+  const presetParam = searchParams.get('preset')
+
+  if (editParam !== null) {
+    const idx = parseInt(editParam)
+    const workouts = loadWorkouts()
+    return { workout: workouts[idx] ?? null, editIndex: idx }
+  }
+
+  if (presetParam !== null) {
+    const idx = parseInt(presetParam)
+    return { workout: PRESETS[idx] ?? null, editIndex: null }
+  }
+
+  return { workout: null, editIndex: null }
 }
 
 export default function ConfigClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const wParam = searchParams.get('w')
-  const editIndexParam = searchParams.get('editIndex')
-
-  const passedWorkout = wParam ? decodeWorkout(wParam) : null
-  const editIndex = editIndexParam !== null ? parseInt(editIndexParam) : null
-
+  const { workout: passedWorkout, editIndex } = resolveWorkout(searchParams)
   const mode: 'new' | 'edit' | 'preset' = !passedWorkout ? 'new' : editIndex !== null ? 'edit' : 'preset'
 
-  const derived = passedWorkout ? deriveSimpleParams(passedWorkout) : { workSeconds: 30, restSeconds: 15 }
+  const initialSegments = passedWorkout ? normalizeSegments(passedWorkout.segments) : DEFAULT_SEGMENTS
 
   const [name, setName] = useState(passedWorkout?.name ?? 'My Workout')
-  const [workSeconds, setWorkSeconds] = useState(derived.workSeconds)
-  const [restSeconds, setRestSeconds] = useState(derived.restSeconds)
+  const [segments, setSegments] = useState<EditableSegment[]>(initialSegments)
   const [rounds, setRounds] = useState(passedWorkout?.rounds ?? 3)
-  const [prepareSeconds, setPrepareSeconds] = useState(passedWorkout?.prepareSeconds ?? 10)
   const [saveChecked, setSaveChecked] = useState(true)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  const origName = passedWorkout?.name ?? ''
-  const origWork = derived.workSeconds
-  const origRest = derived.restSeconds
-  const origRounds = passedWorkout?.rounds ?? 3
-  const origPrepare = passedWorkout?.prepareSeconds ?? 10
+  const origRef = useRef({
+    name: passedWorkout?.name ?? '',
+    segJson: JSON.stringify(initialSegments),
+    rounds: passedWorkout?.rounds ?? 3,
+  })
 
   const hasChanges =
-    name !== origName ||
-    workSeconds !== origWork ||
-    restSeconds !== origRest ||
-    rounds !== origRounds ||
-    prepareSeconds !== origPrepare
+    name !== origRef.current.name ||
+    JSON.stringify(segments) !== origRef.current.segJson ||
+    rounds !== origRef.current.rounds
 
-  const workoutType = passedWorkout?.type ?? 'custom'
-  const total = totalSeconds(buildWorkout(name, workoutType, workSeconds, restSeconds, rounds, prepareSeconds))
+  const total = useMemo(
+    () => 10 + segments.reduce((s, seg) => s + seg.durationSeconds, 0) * rounds,
+    [segments, rounds],
+  )
+
+  function buildWorkoutFromState(): Workout {
+    return {
+      name,
+      type: 'custom',
+      segments: segments.map(s => ({ type: s.type, durationSeconds: s.durationSeconds })),
+      rounds,
+      prepareSeconds: 10,
+    }
+  }
 
   function handleStart() {
     initAudio()
-    const workout = buildWorkout(name, workoutType, workSeconds, restSeconds, rounds, prepareSeconds)
+    const workout = buildWorkoutFromState()
     if (mode === 'new' && saveChecked) addWorkout(workout)
-    router.push(`/timer?w=${encodeWorkout(workout)}`)
+    sessionStorage.setItem('grind-workout', JSON.stringify(workout))
+    router.push('/timer')
   }
 
   function handleSaveOnly() {
-    const workout = buildWorkout(name, workoutType, workSeconds, restSeconds, rounds, prepareSeconds)
-    addWorkout(workout)
+    addWorkout(buildWorkoutFromState())
     router.push('/')
   }
 
   function handleUpdate() {
     if (editIndex === null) return
-    const workout = buildWorkout(name, workoutType, workSeconds, restSeconds, rounds, prepareSeconds)
-    updateWorkout(editIndex, workout)
+    updateWorkout(editIndex, buildWorkoutFromState())
     router.back()
   }
 
@@ -115,6 +134,19 @@ export default function ConfigClient() {
     if (editIndex === null) return
     deleteWorkout(editIndex)
     router.push('/')
+  }
+
+  function handleSegmentChange(index: number, updated: EditableSegment) {
+    setSegments(prev => prev.map((s, i) => i === index ? updated : s))
+  }
+
+  function handleSegmentDelete(index: number) {
+    if (segments.length <= 1) return
+    setSegments(prev => prev.filter((_, i) => i !== index))
+  }
+
+  function handleAddSegment() {
+    setSegments(prev => [...prev, { type: 'work', durationSeconds: 30 }])
   }
 
   const outlinedBtnStyle = (disabled: boolean): React.CSSProperties => ({
@@ -151,7 +183,7 @@ export default function ConfigClient() {
   return (
     <div className="full-screen safe-bottom" style={{ background: C.bg, padding: '0 16px 48px' }}>
       <div style={{ maxWidth: 500, margin: '0 auto', paddingTop: 64 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
           <GrindLogo onClick={() => router.push('/')} />
           {mode === 'edit' && (
             <button
@@ -207,34 +239,44 @@ export default function ConfigClient() {
             </div>
           )}
 
-          <DurationPicker
-            label="WORK INTERVAL"
-            value={workSeconds}
-            step={5}
-            min={5}
-            max={600}
-            onChange={setWorkSeconds}
-          />
-
-          <DurationPicker
-            label="REST INTERVAL"
-            value={restSeconds}
-            step={5}
-            min={0}
-            max={300}
-            onChange={setRestSeconds}
-          />
-
           <RoundsPicker value={rounds} onChange={setRounds} />
 
-          <DurationPicker
-            label="PREPARE TIME"
-            value={prepareSeconds}
-            step={5}
-            min={0}
-            max={30}
-            onChange={setPrepareSeconds}
-          />
+          {/* Intervals */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5, marginBottom: 8 }}>
+              INTERVALS
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {segments.map((seg, i) => (
+                <SegmentRow
+                  key={i}
+                  segment={seg}
+                  index={i}
+                  canDelete={segments.length > 1}
+                  onChange={handleSegmentChange}
+                  onDelete={handleSegmentDelete}
+                />
+              ))}
+            </div>
+            <button
+              onClick={handleAddSegment}
+              style={{
+                width: '100%',
+                height: 44,
+                marginTop: 8,
+                background: 'transparent',
+                border: `1.5px dashed ${C.border}`,
+                borderRadius: 12,
+                color: C.textMuted,
+                fontSize: 14,
+                fontWeight: 600,
+                letterSpacing: 0.5,
+                cursor: 'pointer',
+              }}
+            >
+              + ADD INTERVAL
+            </button>
+          </div>
 
           {/* Divider */}
           <div style={{ height: 1, background: C.border, margin: '4px 0' }} />
