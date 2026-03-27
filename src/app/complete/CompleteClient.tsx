@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { formatTime } from '@/lib/utils'
+import { C } from '@/lib/colors'
 
 export default function CompleteClient() {
   const router = useRouter()
@@ -12,7 +13,7 @@ export default function CompleteClient() {
 
   return (
     <div className="full-screen safe-top safe-bottom" style={{
-      background: '#0F0F0F',
+      background: C.bg,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -25,12 +26,12 @@ export default function CompleteClient() {
         width: 100,
         height: 100,
         borderRadius: '50%',
-        background: 'rgba(46,204,113,0.15)',
+        background: `${C.green}26`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="#2ECC71">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill={C.green}>
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
         </svg>
       </div>
@@ -39,7 +40,7 @@ export default function CompleteClient() {
       <h1 style={{
         fontSize: 32,
         fontWeight: 800,
-        color: '#F5F5F5',
+        color: C.text,
         lineHeight: 1.2,
         letterSpacing: -0.5,
         textAlign: 'center',
@@ -51,7 +52,7 @@ export default function CompleteClient() {
 
       {/* Workout name */}
       {name && (
-        <p style={{ fontSize: 16, color: '#888888', fontWeight: 500, margin: 0, textAlign: 'center' }}>
+        <p style={{ fontSize: 16, color: C.textMuted, fontWeight: 500, margin: 0, textAlign: 'center' }}>
           {name}
         </p>
       )}
@@ -61,7 +62,7 @@ export default function CompleteClient() {
         fontFamily: 'var(--font-roboto-mono)',
         fontSize: 48,
         fontWeight: 700,
-        color: '#FF6B35',
+        color: C.orange,
       }}>
         {formatTime(elapsed)}
       </div>
@@ -72,7 +73,7 @@ export default function CompleteClient() {
         style={{
           width: 200,
           height: 56,
-          background: '#2ECC71',
+          background: C.green,
           border: 'none',
           borderRadius: 16,
           color: '#fff',

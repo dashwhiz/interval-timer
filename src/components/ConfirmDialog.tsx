@@ -1,5 +1,7 @@
 'use client'
 
+import { C } from '@/lib/colors'
+
 interface Props {
   title: string
   message: string
@@ -15,7 +17,7 @@ export default function ConfirmDialog({
   title,
   message,
   confirmLabel,
-  confirmColor = '#E74C3C',
+  confirmColor = C.red,
   cancelLabel = 'CANCEL',
   icon,
   onConfirm,
@@ -41,9 +43,9 @@ export default function ConfirmDialog({
           maxWidth: 340,
           width: '100%',
           padding: 28,
-          background: '#1A1A1A',
+          background: C.surface,
           borderRadius: 20,
-          border: '1px solid #252525',
+          border: `1px solid ${C.border}`,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -55,10 +57,10 @@ export default function ConfirmDialog({
             {icon}
           </div>
         )}
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#F5F5F5', margin: 0, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: C.text, margin: 0, textAlign: 'center' }}>
           {title}
         </h2>
-        <p style={{ fontSize: 14, color: '#888888', lineHeight: 1.4, margin: 0, textAlign: 'center' }}>
+        <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.4, margin: 0, textAlign: 'center' }}>
           {message}
         </p>
         <div style={{ display: 'flex', gap: 12, width: '100%', marginTop: 4 }}>
@@ -67,10 +69,10 @@ export default function ConfirmDialog({
             style={{
               flex: 1,
               height: 48,
-              background: '#252525',
+              background: C.elevated,
               border: 'none',
               borderRadius: 12,
-              color: '#F5F5F5',
+              color: C.text,
               fontSize: 14,
               fontWeight: 600,
               letterSpacing: 0.5,
@@ -87,7 +89,7 @@ export default function ConfirmDialog({
               background: confirmColor,
               border: 'none',
               borderRadius: 12,
-              color: '#F5F5F5',
+              color: C.text,
               fontSize: 14,
               fontWeight: 600,
               letterSpacing: 0.5,

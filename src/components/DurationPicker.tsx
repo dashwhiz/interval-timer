@@ -1,6 +1,7 @@
 'use client'
 
 import { formatDuration } from '@/lib/utils'
+import { C } from '@/lib/colors'
 
 interface Props {
   label: string
@@ -20,7 +21,7 @@ export default function DurationPicker({ label, value, step, min, max, onChange 
     height: 40,
     border: 'none',
     background: 'none',
-    color: disabled ? 'rgba(136,136,136,0.3)' : '#F5F5F5',
+    color: disabled ? `${C.textMuted}4D` : C.text,
     fontSize: 24,
     cursor: disabled ? 'default' : 'pointer',
     display: 'flex',
@@ -33,11 +34,11 @@ export default function DurationPicker({ label, value, step, min, max, onChange 
 
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 500, color: '#888888', letterSpacing: 0.5, marginBottom: 8 }}>
+      <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5, marginBottom: 8 }}>
         {label}
       </div>
       <div style={{
-        background: '#1A1A1A',
+        background: C.surface,
         borderRadius: 12,
         padding: '4px 8px',
         display: 'flex',
@@ -58,7 +59,7 @@ export default function DurationPicker({ label, value, step, min, max, onChange 
           fontFamily: 'var(--font-roboto-mono)',
           fontSize: 16,
           fontWeight: 600,
-          color: '#F5F5F5',
+          color: C.text,
         }}>
           {formatDuration(value)}
         </span>

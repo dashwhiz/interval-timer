@@ -6,6 +6,7 @@ import { useTimer } from '@/hooks/useTimer'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { decodeWorkout, encodeWorkout, formatTime } from '@/lib/utils'
 import { setThemeColor } from '@/lib/theme-color'
+import { C } from '@/lib/colors'
 
 function PlayIcon({ size }: { size: number }) {
   return (
@@ -41,8 +42,8 @@ function StopIcon({ size }: { size: number }) {
 
 function ExitIcon() {
   return (
-    <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(231,76,60,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="#E74C3C">
+    <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${C.red}1F`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill={C.red}>
         <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
       </svg>
     </div>
@@ -58,7 +59,7 @@ export default function TimerClient() {
   const workout = useMemo(() => wParam ? decodeWorkout(wParam) : null, [wParam])
 
   const handleComplete = useCallback((elapsed: number) => {
-    setThemeColor('#0F0F0F')
+    setThemeColor(C.bg)
     const params = new URLSearchParams({
       name: workout?.name ?? '',
       elapsed: String(elapsed),
@@ -79,17 +80,14 @@ export default function TimerClient() {
     reset,
   } = useTimer(workout, handleComplete)
 
-  // Update theme color on phase change
   useEffect(() => {
     setThemeColor(segmentColor)
   }, [segmentColor])
 
-  // Reset theme on unmount
   useEffect(() => {
-    return () => { setThemeColor('#0F0F0F') }
+    return () => { setThemeColor(C.bg) }
   }, [])
 
-  // Keyboard shortcuts
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.code === 'Space') {
@@ -116,7 +114,7 @@ export default function TimerClient() {
 
   function handleQuitConfirm() {
     setShowQuit(false)
-    setThemeColor('#0F0F0F')
+    setThemeColor(C.bg)
     router.push('/')
   }
 
@@ -126,7 +124,8 @@ export default function TimerClient() {
   }
 
   const textColor = segmentTextColor
-  const btnBg = `${textColor === '#FFFFFF' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'}`
+  const isLight = textColor === '#000000'
+  const btnBg = isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.15)'
 
   const circleBtn = (size: number, disabled?: boolean): React.CSSProperties => ({
     width: size,
@@ -192,12 +191,10 @@ export default function TimerClient() {
 
       {/* Controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-        {/* Reset */}
         <button style={circleBtn(56)} onClick={reset} aria-label="Reset">
           <ResetIcon size={28} />
         </button>
 
-        {/* Play/Pause */}
         <button
           style={circleBtn(72, status === 'finished')}
           disabled={status === 'finished'}
@@ -209,19 +206,17 @@ export default function TimerClient() {
             : <PlayIcon size={40} />}
         </button>
 
-        {/* Stop */}
         <button style={circleBtn(56)} onClick={handleStop} aria-label="Stop">
           <StopIcon size={28} />
         </button>
       </div>
 
-      {/* Quit confirmation */}
       {showQuit && (
         <ConfirmDialog
           title="Quit Workout?"
           message="Your progress will be lost."
           confirmLabel="QUIT"
-          confirmColor="#E74C3C"
+          confirmColor={C.red}
           cancelLabel="KEEP GOING"
           icon={<ExitIcon />}
           onConfirm={handleQuitConfirm}

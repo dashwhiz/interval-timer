@@ -4,14 +4,7 @@ import { useState } from 'react'
 import type { Workout } from '@/lib/types'
 import { TYPE_LABELS as TL } from '@/lib/types'
 import { totalSeconds as ts, formatDuration as fd } from '@/lib/utils'
-
-interface Props {
-  workout: Workout
-  accentColor: string
-  showDelete?: boolean
-  onPress: () => void
-  onDelete?: () => void
-}
+import { C } from '@/lib/colors'
 
 function TimerIcon({ color }: { color: string }) {
   return (
@@ -29,18 +22,14 @@ function RepeatIcon({ color }: { color: string }) {
   )
 }
 
-function XIcon({ size = 16, color }: { size?: number; color: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-    </svg>
-  )
+interface Props {
+  workout: Workout
+  accentColor: string
+  onPress: () => void
 }
 
-export default function PresetCard({ workout, accentColor, showDelete, onPress, onDelete }: Props) {
-  const [pressed, setPressed] = useState(false)
+export default function PresetCard({ workout, accentColor, onPress }: Props) {
   const [hovered, setHovered] = useState(false)
-
   const total = ts(workout)
   const label = TL[workout.type]
 
@@ -51,68 +40,46 @@ export default function PresetCard({ workout, accentColor, showDelete, onPress, 
       onClick={onPress}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onPress() }}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setHovered(false); setPressed(false) }}
-      onMouseDown={() => setPressed(true)}
-      onMouseUp={() => setPressed(false)}
-      onTouchStart={() => setPressed(true)}
-      onTouchEnd={() => setPressed(false)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: hovered || pressed ? '#252525' : '#1A1A1A',
-        border: hovered || pressed ? `1px solid ${accentColor}4D` : '1px solid transparent',
+        background: hovered ? C.elevated : C.surface,
+        border: `1px solid ${hovered ? `${accentColor}4D` : C.border}`,
         borderRadius: 14,
         padding: 16,
         cursor: 'pointer',
-        transition: 'background 120ms, border-color 120ms',
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
         userSelect: 'none',
         outline: 'none',
+        transition: 'background 120ms, border-color 120ms',
       }}
     >
       {/* Top row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <span style={{ fontSize: 16, fontWeight: 600, color: '#F5F5F5', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 16, fontWeight: 600, color: C.text, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {workout.name}
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: 0.5,
-            color: accentColor,
-            background: `${accentColor}1F`,
-            borderRadius: 6,
-            padding: '3px 7px',
-            whiteSpace: 'nowrap',
-          }}>
-            {label}
-          </span>
-          {showDelete && onDelete && (
-            <button
-              onClick={e => { e.stopPropagation(); onDelete() }}
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 2,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-              aria-label="Delete workout"
-            >
-              <XIcon color="#888888" />
-            </button>
-          )}
-        </div>
+        <span style={{
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: 0.5,
+          color: accentColor,
+          background: `${accentColor}22`,
+          borderRadius: 6,
+          padding: '3px 7px',
+          whiteSpace: 'nowrap',
+        }}>
+          {label}
+        </span>
       </div>
 
       {/* Bottom row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <TimerIcon color="#888888" />
-        <span style={{ fontSize: 12, color: '#888888' }}>{fd(total)}</span>
-        <RepeatIcon color="#888888" />
-        <span style={{ fontSize: 12, color: '#888888' }}>{workout.rounds} rounds</span>
+        <TimerIcon color={C.textMuted} />
+        <span style={{ fontSize: 12, color: C.textMuted }}>{fd(total)}</span>
+        <RepeatIcon color={C.textMuted} />
+        <span style={{ fontSize: 12, color: C.textMuted }}>{workout.rounds} rounds</span>
       </div>
     </div>
   )

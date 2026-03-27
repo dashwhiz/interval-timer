@@ -2,21 +2,22 @@
 
 :root {
   color-scheme: dark;
-  --background: #0F0F0F;
-  --surface: #1A1A1A;
-  --surface-light: #252525;
-  --work-color: #FF6B35;
-  --rest-color: #4ECDC4;
-  --prepare-color: #FFE66D;
-  --text-primary: #F5F5F5;
-  --text-secondary: #888888;
-  --start-green: #2ECC71;
-  --stop-red: #E74C3C;
+  --background:     #0d1117;
+  --surface:        #161b22;
+  --surface-light:  #21262d;
+  --border:         #30363d;
+  --work-color:     #f0883e;
+  --rest-color:     #4ECDC4;
+  --prepare-color:  #e3b341;
+  --text-primary:   #e6edf3;
+  --text-secondary: #7d8590;
+  --start-green:    #3fb950;
+  --stop-red:       #f85149;
 }
 
 html, body {
-  background-color: #0F0F0F;
-  color: #F5F5F5;
+  background-color: #0d1117;
+  color: #e6edf3;
   margin: 0;
   padding: 0;
   min-height: 100%;
@@ -28,18 +29,20 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Prevent scroll bounce revealing white background */
 html {
   overflow-y: scroll;
+  overscroll-behavior: none;
 }
 
-/* Use dynamic viewport height so content fits when Safari address bar is visible.
-   100vh on mobile Safari = max height (bar hidden), which is too tall. */
+body {
+  overscroll-behavior: none;
+}
+
 .full-screen {
-  min-height: 100vh;         /* fallback */
-  min-height: 100dvh;        /* iOS 15+: tracks actual visible viewport */
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* Utility: pad content away from notch/home indicator */
 .safe-top    { padding-top:    env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
