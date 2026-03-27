@@ -75,7 +75,7 @@ export function useTimer(
         setState({ status: 'finished', currentSegmentIndex: prev.currentSegmentIndex, secondsLeft: 0, elapsedSeconds: newElapsed })
         setTimeout(() => {
           onCompleteRef.current(newElapsed)
-        }, 2000)
+        }, 800)
       } else {
         playTransition()
         setState({

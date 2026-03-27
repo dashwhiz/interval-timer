@@ -31,11 +31,6 @@ html, body {
 
 html {
   overflow-y: scroll;
-  overscroll-behavior: none;
-}
-
-body {
-  overscroll-behavior: none;
 }
 
 .full-screen {

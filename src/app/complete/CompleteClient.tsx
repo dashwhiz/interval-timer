@@ -18,51 +18,31 @@ export default function CompleteClient() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 24,
-      gap: 20,
+      padding: '24px 32px',
+      gap: 16,
     }}>
-      {/* Checkmark */}
-      <div style={{
-        width: 100,
-        height: 100,
-        borderRadius: '50%',
-        background: `${C.green}26`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <svg width="56" height="56" viewBox="0 0 24 24" fill={C.green}>
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-        </svg>
-      </div>
-
-      {/* Title */}
-      <h1 style={{
-        fontSize: 32,
-        fontWeight: 800,
-        color: C.text,
-        lineHeight: 1.2,
-        letterSpacing: -0.5,
-        textAlign: 'center',
-        margin: 0,
-        whiteSpace: 'pre-line',
-      }}>
-        {'WORKOUT\nCOMPLETE'}
-      </h1>
+      {/* Check */}
+      <svg width="36" height="36" viewBox="0 0 24 24" fill={C.green}>
+        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+      </svg>
 
       {/* Workout name */}
       {name && (
-        <p style={{ fontSize: 16, color: C.textMuted, fontWeight: 500, margin: 0, textAlign: 'center' }}>
-          {name}
+        <p style={{ fontSize: 13, color: C.textMuted, fontWeight: 500, margin: 0, textAlign: 'center', letterSpacing: 0.5 }}>
+          {name.toUpperCase()}
         </p>
       )}
 
-      {/* Total time */}
+      {/* Elapsed time — the hero */}
       <div style={{
         fontFamily: 'var(--font-roboto-mono)',
-        fontSize: 48,
+        fontSize: 'clamp(56px, 18vw, 96px)',
         fontWeight: 700,
-        color: C.orange,
+        color: C.text,
+        letterSpacing: '-2px',
+        lineHeight: 1,
+        marginTop: 8,
+        marginBottom: 8,
       }}>
         {formatTime(elapsed)}
       </div>
@@ -71,17 +51,18 @@ export default function CompleteClient() {
       <button
         onClick={() => router.push('/')}
         style={{
-          width: 200,
-          height: 56,
-          background: C.green,
-          border: 'none',
-          borderRadius: 16,
-          color: '#fff',
-          fontSize: 16,
+          marginTop: 16,
+          height: 52,
+          paddingLeft: 48,
+          paddingRight: 48,
+          background: C.elevated,
+          border: `1px solid ${C.border}`,
+          borderRadius: 14,
+          color: C.text,
+          fontSize: 14,
           fontWeight: 700,
           letterSpacing: 2,
           cursor: 'pointer',
-          marginTop: 8,
         }}
       >
         DONE
