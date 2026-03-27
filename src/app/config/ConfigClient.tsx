@@ -97,7 +97,7 @@ export default function ConfigClient() {
     rounds !== origRef.current.rounds
 
   const total = useMemo(
-    () => 10 + segments.reduce((s, seg) => s + seg.durationSeconds, 0) * rounds,
+    () => segments.reduce((s, seg) => s + seg.durationSeconds, 0) * rounds,
     [segments, rounds],
   )
 
