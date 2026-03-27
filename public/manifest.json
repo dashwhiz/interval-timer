@@ -1,11 +1,11 @@
 {
-  "name": "Interval Timer",
-  "short_name": "Timer",
+  "name": "Grind",
+  "short_name": "Grind",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#0F0F0F",
-  "theme_color": "#0F0F0F",
-  "description": "CrossFit & HIIT Interval Timer",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "description": "CrossFit & HIIT interval timer",
   "orientation": "any",
   "prefer_related_applications": false,
   "icons": [

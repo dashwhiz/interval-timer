@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from 'react'
 import type React from 'react'
+import GrindLogo from '@/components/GrindLogo'
 import { useRouter } from 'next/navigation'
 import PresetCard from '@/components/PresetCard'
 import { PRESETS } from '@/lib/presets'
@@ -29,9 +30,7 @@ export default function HomePage() {
       <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 64 }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.5, color: C.text, margin: 0 }}>
-            INTERVAL TIMER
-          </h1>
+          <GrindLogo />
           <button
             onClick={() => goToConfig()}
             style={{

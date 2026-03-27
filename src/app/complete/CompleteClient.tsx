@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { formatTime } from '@/lib/utils'
 import { C } from '@/lib/colors'
@@ -7,6 +8,8 @@ import { C } from '@/lib/colors'
 export default function CompleteClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  useEffect(() => { router.prefetch('/') }, [router])
 
   const name = searchParams.get('name') ?? ''
   const elapsed = parseInt(searchParams.get('elapsed') ?? '0')

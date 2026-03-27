@@ -21,8 +21,8 @@ const robotoMono = Roboto_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Interval Timer',
-  description: 'CrossFit & HIIT Interval Timer',
+  title: 'Grind',
+  description: 'CrossFit & HIIT interval timer',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

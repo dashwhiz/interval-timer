@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import DurationPicker from '@/components/DurationPicker'
 import RoundsPicker from '@/components/RoundsPicker'
 import ConfirmDialog from '@/components/ConfirmDialog'
+import GrindLogo from '@/components/GrindLogo'
 import { decodeWorkout, encodeWorkout, totalSeconds, formatDuration } from '@/lib/utils'
 import { addWorkout, updateWorkout, deleteWorkout } from '@/lib/storage'
 import { initAudio } from '@/lib/audio'
@@ -163,6 +164,9 @@ export default function ConfigClient() {
   return (
     <div className="full-screen safe-bottom" style={{ background: C.bg, padding: '0 16px 48px' }}>
       <div style={{ maxWidth: 500, margin: '0 auto', paddingTop: 64 }}>
+        <div style={{ marginBottom: 32 }}>
+          <GrindLogo onClick={() => router.push('/')} />
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* Workout name */}
@@ -180,7 +184,7 @@ export default function ConfigClient() {
                   fontWeight: 700,
                   color: C.text,
                   background: C.surface,
-                  border: 'none',
+                  border: `1px solid ${C.border}`,
                   borderRadius: 12,
                   padding: '12px 16px',
                   outline: 'none',
@@ -234,6 +238,7 @@ export default function ConfigClient() {
             <div style={{
               background: C.surface,
               borderRadius: 12,
+              border: `1px solid ${C.border}`,
               padding: 16,
               display: 'flex',
               alignItems: 'center',

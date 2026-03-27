@@ -80,6 +80,8 @@ export default function TimerClient() {
     reset,
   } = useTimer(workout, handleComplete)
 
+  useEffect(() => { router.prefetch('/') }, [router])
+
   useEffect(() => {
     setThemeColor(segmentColor)
   }, [segmentColor])

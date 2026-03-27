@@ -38,6 +38,7 @@ export default function RoundsPicker({ value, onChange }: Props) {
       <div style={{
         background: C.surface,
         borderRadius: 12,
+        border: `1px solid ${C.border}`,
         padding: '4px 8px',
         display: 'flex',
         alignItems: 'center',
