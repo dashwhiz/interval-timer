@@ -330,7 +330,7 @@ export default function ConfigClient() {
               onClick={handleAddSegment}
               style={{
                 width: '100%',
-                padding: '14px 0',
+                minHeight: 54,
                 marginTop: 8,
                 background: 'transparent',
                 border: `1.5px dashed ${C.border}`,
@@ -340,6 +340,9 @@ export default function ConfigClient() {
                 fontWeight: 600,
                 letterSpacing: 0.5,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
               + ADD INTERVAL
