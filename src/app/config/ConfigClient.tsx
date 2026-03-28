@@ -140,9 +140,8 @@ export default function ConfigClient() {
 
   async function handleShare() {
     const workout = buildWorkoutFromState()
-    const shareUrl = new URL('/config', window.location.href)
-    shareUrl.search = `?share=${encodeWorkout(workout)}`
-    const url = shareUrl.toString()
+    const base = window.location.pathname.replace(/\/config.*$/, '')
+    const url = `${window.location.origin}${base}/config?share=${encodeWorkout(workout)}`
 
     if (navigator.share) {
       try {
