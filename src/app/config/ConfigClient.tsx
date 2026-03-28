@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useSyncExternalStore } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import RoundsPicker from '@/components/RoundsPicker'
 import SegmentRow from '@/components/SegmentRow'
@@ -8,7 +8,7 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 import GrindLogo from '@/components/GrindLogo'
 import type { EditableSegment } from '@/components/SegmentRow'
 import { formatDuration, encodeWorkout, decodeWorkout } from '@/lib/utils'
-import { addWorkout, updateWorkout, deleteWorkout, loadWorkouts } from '@/lib/storage'
+import { addWorkout, updateWorkout, deleteWorkout, getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts } from '@/lib/storage'
 import { PRESETS } from '@/lib/presets'
 import { initAudio } from '@/lib/audio'
 import { C } from '@/lib/colors'
@@ -44,14 +44,13 @@ function normalizeSegments(segments: IntervalSegment[]): EditableSegment[] {
   return result.length > 0 ? result : DEFAULT_SEGMENTS
 }
 
-function resolveWorkout(searchParams: URLSearchParams): { workout: Workout | null; editIndex: number | null } {
+function resolveWorkout(searchParams: URLSearchParams, userWorkouts: Workout[]): { workout: Workout | null; editIndex: number | null } {
   const editParam = searchParams.get('edit')
   const presetParam = searchParams.get('preset')
 
   if (editParam !== null) {
     const idx = parseInt(editParam)
-    const workouts = loadWorkouts()
-    return { workout: workouts[idx] ?? null, editIndex: idx }
+    return { workout: userWorkouts[idx] ?? null, editIndex: idx }
   }
 
   if (presetParam !== null) {
@@ -71,8 +70,9 @@ function resolveWorkout(searchParams: URLSearchParams): { workout: Workout | nul
 export default function ConfigClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const userWorkouts = useSyncExternalStore(subscribeWorkouts, getWorkoutsSnapshot, getWorkoutsServerSnapshot)
 
-  const { workout: passedWorkout, editIndex } = resolveWorkout(searchParams)
+  const { workout: passedWorkout, editIndex } = resolveWorkout(searchParams, userWorkouts)
   const isShare = searchParams.get('share') !== null
   const mode: 'new' | 'edit' | 'preset' = !passedWorkout ? 'new' : isShare ? 'new' : editIndex !== null ? 'edit' : 'preset'
 
