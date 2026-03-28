@@ -19,11 +19,13 @@ export interface TimerControls {
   status: TimerStatus
   currentSegment: IntervalSegment | null
   secondsLeft: number
+  segmentDuration: number
   round: number
   totalRounds: number
   segmentColor: string
   segmentTextColor: string
   segmentLabel: string
+  nextLabel: string | null
   play: () => void
   pause: () => void
   reset: () => void
@@ -78,6 +80,7 @@ export function useTimer(
         }, 800)
       } else {
         playTransition()
+        navigator.vibrate?.(200)
         setState({
           status: 'running',
           currentSegmentIndex: nextIndex,
@@ -137,15 +140,20 @@ export function useTimer(
     }
   }
 
+  const nextSeg = sequence[state.currentSegmentIndex + 1] ?? null
+  const nextConfig = nextSeg ? SEGMENT_CONFIG[nextSeg.type] : null
+
   return {
     status: state.status,
     currentSegment,
     secondsLeft: state.secondsLeft,
+    segmentDuration: currentSegment?.durationSeconds ?? 0,
     round,
     totalRounds,
     segmentColor: config.color,
     segmentTextColor: config.textColor,
     segmentLabel: currentSegment?.label || config.label,
+    nextLabel: nextSeg ? (nextSeg.label || nextConfig!.label) : null,
     play,
     pause,
     reset,

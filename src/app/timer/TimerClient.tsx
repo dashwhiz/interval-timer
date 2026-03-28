@@ -88,6 +88,7 @@ export default function TimerClient() {
     segmentColor,
     segmentTextColor,
     segmentLabel,
+    nextLabel,
     play,
     pause,
     reset,
@@ -147,6 +148,8 @@ export default function TimerClient() {
     if (status === 'paused') play()
   }
 
+  const isPulsing = secondsLeft <= 3 && secondsLeft > 0 && status === 'running'
+
   if (!workout) return null
 
   const textColor = segmentTextColor
@@ -180,15 +183,22 @@ export default function TimerClient() {
       paddingRight: 24,
       transition: 'background 500ms ease-in-out',
     }}>
-      {/* Top: round info */}
-      <div style={{
-        fontSize: 14,
-        fontWeight: 500,
-        color: `${textColor}77`,
-        letterSpacing: 1,
-        minHeight: 20,
-      }}>
-        {round > 0 ? `ROUND ${round} / ${totalRounds}` : ''}
+      {/* Top: round + next up */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        <div style={{
+          fontSize: 14,
+          fontWeight: 500,
+          color: `${textColor}77`,
+          letterSpacing: 1,
+          minHeight: 20,
+        }}>
+          {round > 0 ? `ROUND ${round} / ${totalRounds}` : ''}
+        </div>
+        {nextLabel && (
+          <div style={{ fontSize: 12, fontWeight: 500, color: `${textColor}55`, letterSpacing: 0.5 }}>
+            Next: {nextLabel}
+          </div>
+        )}
       </div>
 
       {/* Center: label + timer as one block */}
@@ -212,12 +222,15 @@ export default function TimerClient() {
           letterSpacing: '-2px',
           lineHeight: 1,
           textAlign: 'center',
+          transform: isPulsing ? 'scale(1.08)' : 'scale(1)',
+          transition: 'transform 300ms ease-out',
         }}>
           {formatTime(secondsLeft)}
         </div>
       </div>
 
-      {/* Controls */}
+      {/* Controls + next up */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
         <button style={circleBtn(56)} onClick={reset} aria-label="Reset">
           <ResetIcon size={28} />
@@ -237,6 +250,7 @@ export default function TimerClient() {
         <button style={circleBtn(56)} onClick={handleStop} aria-label="Stop">
           <StopIcon size={28} />
         </button>
+      </div>
       </div>
 
       {showQuit && (
