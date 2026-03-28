@@ -36,8 +36,8 @@ export default function HomePage() {
   }
 
   return (
-    <div className="full-screen safe-bottom" style={{ background: C.bg, padding: '0 16px 48px' }}>
-      <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 64 }}>
+    <div className="full-screen safe-bottom" style={{ background: C.bg, padding: '0 16px 48px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ maxWidth: 700, margin: '0 auto', paddingTop: 64, width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
           <GrindLogo />
@@ -130,6 +130,27 @@ export default function HomePage() {
             </WorkoutGrid>
           )}
         </section>
+
+        {/* Legal */}
+        <div style={{ textAlign: 'center', marginTop: 'auto', paddingTop: 48 }}>
+          <div style={{ width: 40, height: 1, background: C.border, margin: '0 auto 12px' }} />
+          <div style={{ color: `${C.textMuted}44`, fontSize: 11, marginBottom: 6 }}>
+            © 2026 Grind
+          </div>
+          <button
+            onClick={() => router.push('/legal')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: `${C.textMuted}66`,
+              fontSize: 11,
+              cursor: 'pointer',
+              padding: 0,
+            }}
+          >
+            Impressum & Privacy
+          </button>
+        </div>
       </div>
     </div>
   )
