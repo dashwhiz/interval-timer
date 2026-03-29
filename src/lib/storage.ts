@@ -69,6 +69,28 @@ export function getWorkoutsServerSnapshot(): Workout[] {
   return EMPTY
 }
 
+// Completed sessions counter
+const SESSIONS_KEY = 'grind-completed-sessions'
+
+export function incrementCompletedSessions(): void {
+  const count = parseInt(localStorage.getItem(SESSIONS_KEY) ?? '0') || 0
+  localStorage.setItem(SESSIONS_KEY, String(count + 1))
+  notify()
+}
+
+export function getCompletedSessions(): number {
+  if (typeof window === 'undefined') return 0
+  return parseInt(localStorage.getItem(SESSIONS_KEY) ?? '0') || 0
+}
+
+export function getCompletedSessionsSnapshot(): number {
+  return parseInt(localStorage.getItem(SESSIONS_KEY) ?? '0') || 0
+}
+
+export function getCompletedSessionsServerSnapshot(): number {
+  return 0
+}
+
 export function subscribeWorkouts(cb: () => void): () => void {
   window.addEventListener(EVENT, cb)
   window.addEventListener('storage', cb)

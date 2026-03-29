@@ -14,13 +14,14 @@ import GrindLogo from '@/components/GrindLogo'
 import { useRouter } from 'next/navigation'
 import PresetCard from '@/components/PresetCard'
 import { PRESETS } from '@/lib/presets'
-import { getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts } from '@/lib/storage'
+import { getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot } from '@/lib/storage'
 import { C } from '@/lib/colors'
 
 export default function HomePage() {
   const router = useRouter()
   const userWorkouts = useSyncExternalStore(subscribeWorkouts, getWorkoutsSnapshot, getWorkoutsServerSnapshot)
   const presetsOpen = useSyncExternalStore(subscribePresets, getPresetsSnapshot, getPresetsServerSnapshot)
+  const completedSessions = useSyncExternalStore(subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot)
 
   const togglePresets = useCallback(() => {
     localStorage.setItem(PRESETS_KEY, presetsOpen ? 'hide' : 'show')
@@ -62,13 +63,24 @@ export default function HomePage() {
             +
           </button>
         </div>
+
+        {/* Stats bar */}
+        {completedSessions > 0 && (
+          <div style={{ fontSize: 12, color: `${C.textMuted}88`, marginBottom: 24 }}>
+            {completedSessions} session{completedSessions !== 1 ? 's' : ''} completed
+          </div>
+        )}
+
         <div style={{ marginBottom: 32 }} />
 
         {/* User workouts */}
-        {userWorkouts.length > 0 && (
+        {userWorkouts.length > 0 ? (
           <section style={{ marginBottom: 32 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted, letterSpacing: 0.5, marginBottom: 12 }}>
               YOUR WORKOUTS
+              <span style={{ fontWeight: 400, marginLeft: 8, fontSize: 12, color: `${C.textMuted}88` }}>
+                {userWorkouts.length}
+              </span>
             </div>
             <WorkoutGrid>
               {userWorkouts.map((w, i) => (
@@ -81,6 +93,29 @@ export default function HomePage() {
                 />
               ))}
             </WorkoutGrid>
+          </section>
+        ) : (
+          <section style={{ marginBottom: 32 }}>
+            <div
+              role="button"
+              onClick={() => router.push('/config')}
+              style={{
+                background: `${C.green}12`,
+                border: `1.5px dashed ${C.green}44`,
+                borderRadius: 14,
+                padding: '28px 20px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'filter 150ms',
+              }}
+            >
+              <div style={{ fontSize: 15, fontWeight: 600, color: C.text, marginBottom: 6 }}>
+                Create your first workout
+              </div>
+              <div style={{ fontSize: 13, color: C.textMuted }}>
+                Tap here or the + button to get started
+              </div>
+            </div>
           </section>
         )}
 

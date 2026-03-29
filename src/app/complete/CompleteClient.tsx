@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { formatTime } from '@/lib/utils'
+import { incrementCompletedSessions } from '@/lib/storage'
 import { C } from '@/lib/colors'
 
 export default function CompleteClient() {
@@ -10,6 +11,7 @@ export default function CompleteClient() {
   const searchParams = useSearchParams()
 
   useEffect(() => { router.prefetch('/') }, [router])
+  useEffect(() => { incrementCompletedSessions() }, [])
 
   const name = searchParams.get('name') ?? ''
   const elapsed = parseInt(searchParams.get('elapsed') ?? '0') || 0

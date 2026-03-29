@@ -9,7 +9,6 @@ interface Props {
   confirmLabel: string
   confirmColor?: string
   cancelLabel?: string
-  icon?: React.ReactNode
   onConfirm: () => void
   onCancel: () => void
 }
@@ -20,7 +19,6 @@ export default function ConfirmDialog({
   confirmLabel,
   confirmColor = C.red,
   cancelLabel = 'CANCEL',
-  icon,
   onConfirm,
   onCancel,
 }: Props) {
@@ -51,40 +49,30 @@ export default function ConfirmDialog({
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          maxWidth: 340,
+          maxWidth: 320,
           width: '100%',
-          padding: 28,
+          padding: '24px 24px 16px',
           background: C.surface,
-          borderRadius: 20,
+          borderRadius: 16,
           border: `1px solid ${C.border}`,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 12,
         }}
       >
-        {icon && (
-          <div style={{ marginBottom: 4 }}>
-            {icon}
-          </div>
-        )}
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: C.text, margin: 0, textAlign: 'center' }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: C.text, margin: '0 0 6px' }}>
           {title}
         </h2>
-        <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.4, margin: 0, textAlign: 'center' }}>
+        <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.5, margin: 0 }}>
           {message}
         </p>
-        <div style={{ display: 'flex', gap: 12, width: '100%', marginTop: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4, marginTop: 20 }}>
           <button
             onClick={onCancel}
             style={{
-              flex: 1,
-              height: 48,
-              background: C.elevated,
+              background: 'none',
               border: 'none',
-              borderRadius: 12,
-              color: C.text,
-              fontSize: 14,
+              padding: '10px 16px',
+              borderRadius: 8,
+              color: C.textMuted,
+              fontSize: 13,
               fontWeight: 600,
               letterSpacing: 0.5,
               cursor: 'pointer',
@@ -95,13 +83,12 @@ export default function ConfirmDialog({
           <button
             onClick={onConfirm}
             style={{
-              flex: 1,
-              height: 48,
-              background: confirmColor,
+              background: 'none',
               border: 'none',
-              borderRadius: 12,
-              color: C.text,
-              fontSize: 14,
+              padding: '10px 16px',
+              borderRadius: 8,
+              color: confirmColor,
+              fontSize: 13,
               fontWeight: 600,
               letterSpacing: 0.5,
               cursor: 'pointer',

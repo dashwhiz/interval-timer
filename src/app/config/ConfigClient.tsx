@@ -22,16 +22,6 @@ function TimerIcon() {
   )
 }
 
-function DeleteIcon() {
-  return (
-    <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${C.red}1F`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill={C.red}>
-        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-      </svg>
-    </div>
-  )
-}
-
 const DEFAULT_SEGMENTS: EditableSegment[] = [
   { type: 'work', durationSeconds: 30 },
   { type: 'rest', durationSeconds: 15 },
@@ -138,6 +128,12 @@ export default function ConfigClient() {
     router.replace('/')
   }
 
+  function handleDuplicate() {
+    const workout = buildWorkoutFromState()
+    addWorkout(workout)
+    router.replace('/')
+  }
+
   async function handleShare() {
     const workout = buildWorkoutFromState()
     const base = window.location.pathname.replace(/\/config.*$/, '')
@@ -190,6 +186,28 @@ export default function ConfigClient() {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 32 }}>
           <GrindLogo onClick={() => router.push('/')} />
           <div style={{ display: 'flex', gap: 8 }}>
+            {mode === 'edit' && (
+              <button
+                onClick={handleDuplicate}
+                style={{
+                  width: 40,
+                  height: 40,
+                  background: C.surface,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+                aria-label="Duplicate workout"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill={C.textMuted}>
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+              </button>
+            )}
             {mode === 'edit' && (
               <button
                 onClick={handleShare}
@@ -445,7 +463,6 @@ export default function ConfigClient() {
           confirmLabel="DELETE"
           confirmColor={C.red}
           cancelLabel="KEEP"
-          icon={<DeleteIcon />}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setShowDeleteConfirm(false)}
         />

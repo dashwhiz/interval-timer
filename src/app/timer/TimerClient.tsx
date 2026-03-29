@@ -41,16 +41,6 @@ function StopIcon({ size }: { size: number }) {
   )
 }
 
-function ExitIcon() {
-  return (
-    <div style={{ width: 56, height: 56, borderRadius: '50%', background: `${C.red}1F`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill={C.red}>
-        <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
-      </svg>
-    </div>
-  )
-}
-
 function loadWorkoutFromSession(): Workout | null {
   if (typeof window === 'undefined') return null
   try {
@@ -170,19 +160,29 @@ export default function TimerClient() {
     flexShrink: 0,
   })
 
+  function handleTapToggle() {
+    if (status === 'running') pause()
+    else if (status === 'idle' || status === 'paused') play()
+  }
+
   return (
-    <div className="full-screen" style={{
-      background: segmentColor,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingTop: 'calc(48px + env(safe-area-inset-top))',
-      paddingBottom: 'calc(48px + env(safe-area-inset-bottom))',
-      paddingLeft: 24,
-      paddingRight: 24,
-      transition: 'background 500ms ease-in-out',
-    }}>
+    <div
+      className="full-screen"
+      onClick={handleTapToggle}
+      style={{
+        background: segmentColor,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: 'calc(48px + env(safe-area-inset-top))',
+        paddingBottom: 'calc(48px + env(safe-area-inset-bottom))',
+        paddingLeft: 24,
+        paddingRight: 24,
+        transition: 'background 500ms ease-in-out',
+        cursor: 'pointer',
+        userSelect: 'none',
+      }}>
       {/* Top: round + next up */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
         <div style={{
@@ -261,7 +261,6 @@ export default function TimerClient() {
           confirmLabel="QUIT"
           confirmColor={C.red}
           cancelLabel="KEEP GOING"
-          icon={<ExitIcon />}
           onConfirm={handleQuitConfirm}
           onCancel={handleQuitCancel}
         />
