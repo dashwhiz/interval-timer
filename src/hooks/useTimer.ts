@@ -49,12 +49,12 @@ export function useTimer(
     elapsedSeconds: 0,
   })
 
-  const stateRef = useRef(state)
-  stateRef.current = state
-
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const onCompleteRef = useRef(onComplete)
-  onCompleteRef.current = onComplete
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  })
 
   const clearTick = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -64,41 +64,39 @@ export function useTimer(
   }, [])
 
   const tick = useCallback(() => {
-    const prev = stateRef.current
-    if (prev.status !== 'running') return
+    setState(prev => {
+      if (prev.status !== 'running') return prev
 
-    const newElapsed = prev.elapsedSeconds + 1
+      const newElapsed = prev.elapsedSeconds + 1
 
-    if (prev.secondsLeft <= 1) {
-      const nextIndex = prev.currentSegmentIndex + 1
-      if (nextIndex >= sequence.length) {
-        clearTick()
-        playCompleteMelody()
-        setState({ status: 'finished', currentSegmentIndex: prev.currentSegmentIndex, secondsLeft: 0, elapsedSeconds: newElapsed })
-        setTimeout(() => {
-          onCompleteRef.current(newElapsed)
-        }, 800)
+      if (prev.secondsLeft <= 1) {
+        const nextIndex = prev.currentSegmentIndex + 1
+        if (nextIndex >= sequence.length) {
+          clearTick()
+          playCompleteMelody()
+          setTimeout(() => { onCompleteRef.current(newElapsed) }, 800)
+          return { status: 'finished' as const, currentSegmentIndex: prev.currentSegmentIndex, secondsLeft: 0, elapsedSeconds: newElapsed }
+        } else {
+          playTransition()
+          navigator.vibrate?.(200)
+          return {
+            status: 'running' as const,
+            currentSegmentIndex: nextIndex,
+            secondsLeft: sequence[nextIndex].durationSeconds,
+            elapsedSeconds: newElapsed,
+          }
+        }
       } else {
-        playTransition()
-        navigator.vibrate?.(200)
-        setState({
-          status: 'running',
-          currentSegmentIndex: nextIndex,
-          secondsLeft: sequence[nextIndex].durationSeconds,
-          elapsedSeconds: newElapsed,
-        })
+        const newSeconds = prev.secondsLeft - 1
+        playCountdownTick(newSeconds)
+        return { ...prev, secondsLeft: newSeconds, elapsedSeconds: newElapsed }
       }
-    } else {
-      const newSeconds = prev.secondsLeft - 1
-      playCountdownTick(newSeconds)
-      setState({ ...prev, secondsLeft: newSeconds, elapsedSeconds: newElapsed })
-    }
+    })
   }, [sequence, clearTick])
 
   const play = useCallback(() => {
-    if (stateRef.current.status === 'finished') return
     initAudio()
-    setState(prev => ({ ...prev, status: 'running' }))
+    setState(prev => prev.status === 'finished' ? prev : { ...prev, status: 'running' })
   }, [])
 
   const pause = useCallback(() => {

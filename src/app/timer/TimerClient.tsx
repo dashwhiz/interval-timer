@@ -224,6 +224,7 @@ export default function TimerClient() {
           textAlign: 'center',
           transform: isPulsing ? 'scale(1.08)' : 'scale(1)',
           transition: 'transform 300ms ease-out',
+          willChange: 'transform',
         }}>
           {formatTime(secondsLeft)}
         </div>
