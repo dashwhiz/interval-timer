@@ -1,11 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import GrindLogo from '@/components/GrindLogo'
+import ConfirmDialog from '@/components/ConfirmDialog'
 import { C } from '@/lib/colors'
 
 export default function LegalPage() {
   const router = useRouter()
+  const [showPurge, setShowPurge] = useState(false)
+  const [hasData, setHasData] = useState(() => typeof window !== 'undefined' && localStorage.length > 0)
 
   const h2: React.CSSProperties = { fontSize: 18, fontWeight: 700, color: C.text, margin: '32px 0 12px' }
   const p: React.CSSProperties = { fontSize: 14, color: C.textMuted, lineHeight: 1.6, margin: '0 0 12px' }
@@ -77,13 +81,48 @@ export default function LegalPage() {
         </p>
         <p style={p}>
           <strong style={{ color: C.text }}>Your rights.</strong> Since all data is stored locally on your device,
-          you have full control. You can clear your data at any time by clearing your browser's site data.
+          you have full control. You can clear your data at any time using the button below.
         </p>
+
+        <button
+          onClick={() => setShowPurge(true)}
+          disabled={!hasData}
+          style={{
+            marginTop: 8,
+            padding: '10px 20px',
+            background: !hasData ? C.elevated : 'transparent',
+            border: `1.5px solid ${!hasData ? C.border : C.red}`,
+            borderRadius: 10,
+            color: !hasData ? C.textMuted : C.red,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: !hasData ? 'default' : 'pointer',
+          }}
+        >
+          {!hasData ? 'No data stored' : 'Delete all my data'}
+        </button>
 
         <p style={{ ...p, marginTop: 24, color: `${C.textMuted}88` }}>
           Last updated: March 2026
         </p>
       </div>
+
+      {showPurge && (
+        <ConfirmDialog
+          title="Delete all data?"
+          message="This will remove all your saved workouts, preferences, and session history. This cannot be undone."
+          confirmLabel="Delete everything"
+          confirmColor={C.red}
+          cancelLabel="Cancel"
+          onConfirm={() => {
+            localStorage.clear()
+            sessionStorage.clear()
+            setShowPurge(false)
+            setHasData(false)
+          }}
+          onCancel={() => setShowPurge(false)}
+        />
+      )}
     </div>
   )
 }
