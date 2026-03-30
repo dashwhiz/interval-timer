@@ -21,8 +21,8 @@ const PLACEHOLDERS = [
   'e.g. Deadlifts',
 ]
 
-const STEP = 5
-const MIN = 5
+const STEP = 2
+const MIN = 2
 const MAX = 3600
 
 const TYPE_COLORS = {
