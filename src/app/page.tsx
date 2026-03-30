@@ -110,7 +110,6 @@ export default function HomePage() {
                       id={w.name}
                       workout={w}
                       accentColor={C.green}
-                      badge="CUSTOM"
                       onPress={() => goToEdit(i)}
                     />
                   ))}

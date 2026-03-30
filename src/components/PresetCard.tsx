@@ -106,7 +106,7 @@ export default function PresetCard({ workout, accentColor, badge, onPress, dragH
           <RepeatIcon color={C.textMuted} />
           <span style={{ fontSize: 12, color: C.textMuted }}>{workout.rounds} rounds</span>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
-            {workout.segments.filter(s => s.type !== 'prepare').slice(0, 10).map((s, i) => (
+            {workout.segments.filter(s => s.type !== 'prepare').slice(0, 6).map((s, i) => (
               <div
                 key={i}
                 style={{
@@ -117,9 +117,9 @@ export default function PresetCard({ workout, accentColor, badge, onPress, dragH
                 }}
               />
             ))}
-            {workout.segments.filter(s => s.type !== 'prepare').length > 10 && (
+            {workout.segments.filter(s => s.type !== 'prepare').length > 6 && (
               <span style={{ fontSize: 9, color: C.textMuted, fontWeight: 600 }}>
-                +{workout.segments.filter(s => s.type !== 'prepare').length - 10}
+                +{workout.segments.filter(s => s.type !== 'prepare').length - 6}
               </span>
             )}
           </div>
