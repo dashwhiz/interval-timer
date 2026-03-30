@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useSyncExternalStore } from 'react'
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
 
 const PRESETS_KEY = 'grind-presets-visibility'
 function getPresetsSnapshot() { return localStorage.getItem(PRESETS_KEY) !== 'hide' }
@@ -13,8 +15,9 @@ import type React from 'react'
 import GrindLogo from '@/components/GrindLogo'
 import { useRouter } from 'next/navigation'
 import PresetCard from '@/components/PresetCard'
+import SortableWorkoutCard from '@/components/SortableWorkoutCard'
 import { PRESETS } from '@/lib/presets'
-import { getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot } from '@/lib/storage'
+import { getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot, reorderWorkouts } from '@/lib/storage'
 import { C } from '@/lib/colors'
 import { trackEvent } from '@/lib/analytics'
 
@@ -23,6 +26,20 @@ export default function HomePage() {
   const userWorkouts = useSyncExternalStore(subscribeWorkouts, getWorkoutsSnapshot, getWorkoutsServerSnapshot)
   const presetsOpen = useSyncExternalStore(subscribePresets, getPresetsSnapshot, getPresetsServerSnapshot)
   const completedSessions = useSyncExternalStore(subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const fromIndex = userWorkouts.findIndex(w => w.name === active.id)
+    const toIndex = userWorkouts.findIndex(w => w.name === over.id)
+    if (fromIndex === -1 || toIndex === -1) return
+    reorderWorkouts(fromIndex, toIndex)
+  }
 
   const togglePresets = useCallback(() => {
     localStorage.setItem(PRESETS_KEY, presetsOpen ? 'hide' : 'show')
@@ -84,17 +101,22 @@ export default function HomePage() {
                 {userWorkouts.length}
               </span>
             </div>
-            <WorkoutGrid>
-              {userWorkouts.map((w, i) => (
-                <PresetCard
-                  key={i}
-                  workout={w}
-                  accentColor={C.green}
-                  badge="CUSTOM"
-                  onPress={() => goToEdit(i)}
-                />
-              ))}
-            </WorkoutGrid>
+            <DndContext id="workouts-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={userWorkouts.map(w => w.name)} strategy={rectSortingStrategy}>
+                <WorkoutGrid>
+                  {userWorkouts.map((w, i) => (
+                    <SortableWorkoutCard
+                      key={w.name}
+                      id={w.name}
+                      workout={w}
+                      accentColor={C.green}
+                      badge="CUSTOM"
+                      onPress={() => goToEdit(i)}
+                    />
+                  ))}
+                </WorkoutGrid>
+              </SortableContext>
+            </DndContext>
           </section>
         ) : (
           <section style={{ marginBottom: 32 }}>

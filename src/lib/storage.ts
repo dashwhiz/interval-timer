@@ -91,6 +91,14 @@ export function getCompletedSessionsServerSnapshot(): number {
   return 0
 }
 
+export function reorderWorkouts(fromIndex: number, toIndex: number): void {
+  const workouts = loadWorkouts()
+  const [moved] = workouts.splice(fromIndex, 1)
+  workouts.splice(toIndex, 0, moved)
+  persistWorkouts(workouts)
+}
+
+
 export function subscribeWorkouts(cb: () => void): () => void {
   window.addEventListener(EVENT, cb)
   window.addEventListener('storage', cb)

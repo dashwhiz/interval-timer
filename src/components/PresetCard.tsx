@@ -27,9 +27,10 @@ interface Props {
   accentColor: string
   badge?: string
   onPress: () => void
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
-export default function PresetCard({ workout, accentColor, badge, onPress }: Props) {
+export default function PresetCard({ workout, accentColor, badge, onPress, dragHandleProps }: Props) {
   const [hovered, setHovered] = useState(false)
   const total = ts(workout)
 
@@ -45,58 +46,83 @@ export default function PresetCard({ workout, accentColor, badge, onPress }: Pro
         background: hovered ? C.elevated : C.surface,
         border: `1px solid ${hovered ? `${accentColor}4D` : C.border}`,
         borderRadius: 14,
-        padding: 16,
+        padding: '12px 16px',
         cursor: 'pointer',
         display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
+        alignItems: 'center',
+        gap: 10,
         userSelect: 'none',
         outline: 'none',
         transition: 'background 120ms, border-color 120ms',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <span style={{
-          fontSize: 16, fontWeight: 600, color: C.text, flex: 1,
-          overflow: 'hidden', textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-        }}>
-          {workout.name}
-        </span>
-        {badge && (
-          <span style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
-            color: accentColor, background: `${accentColor}22`,
-            borderRadius: 6, padding: '3px 7px', whiteSpace: 'nowrap',
-          }}>
-            {badge}
-          </span>
-        )}
-      </div>
+      {dragHandleProps && (
+        <div
+          {...dragHandleProps}
+          onClick={e => e.stopPropagation()}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'grab',
+            touchAction: 'none',
+            color: C.textMuted,
+            flexShrink: 0,
+            marginLeft: -4,
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
+            <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+            <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+          </svg>
+        </div>
+      )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <TimerIcon color={C.textMuted} />
-        <span style={{ fontSize: 12, color: C.textMuted }}>{fd(total)}</span>
-        <RepeatIcon color={C.textMuted} />
-        <span style={{ fontSize: 12, color: C.textMuted }}>{workout.rounds} rounds</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
-          {workout.segments.filter(s => s.type !== 'prepare').slice(0, 10).map((s, i) => (
-            <div
-              key={i}
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: '50%',
-                background: SEGMENT_CONFIG[s.type].color,
-              }}
-            />
-          ))}
-          {workout.segments.filter(s => s.type !== 'prepare').length > 10 && (
-            <span style={{ fontSize: 9, color: C.textMuted, fontWeight: 600 }}>
-              +{workout.segments.filter(s => s.type !== 'prepare').length - 10}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+          <span style={{
+            fontSize: 16, fontWeight: 600, color: C.text, flex: 1,
+            overflow: 'hidden', textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+          }}>
+            {workout.name}
+          </span>
+          {badge && (
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
+              color: accentColor, background: `${accentColor}22`,
+              borderRadius: 6, padding: '3px 7px', whiteSpace: 'nowrap',
+            }}>
+              {badge}
             </span>
           )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <TimerIcon color={C.textMuted} />
+          <span style={{ fontSize: 12, color: C.textMuted }}>{fd(total)}</span>
+          <RepeatIcon color={C.textMuted} />
+          <span style={{ fontSize: 12, color: C.textMuted }}>{workout.rounds} rounds</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+            {workout.segments.filter(s => s.type !== 'prepare').slice(0, 10).map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  background: SEGMENT_CONFIG[s.type].color,
+                }}
+              />
+            ))}
+            {workout.segments.filter(s => s.type !== 'prepare').length > 10 && (
+              <span style={{ fontSize: 9, color: C.textMuted, fontWeight: 600 }}>
+                +{workout.segments.filter(s => s.type !== 'prepare').length - 10}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

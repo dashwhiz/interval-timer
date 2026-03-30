@@ -64,7 +64,7 @@ export default function SegmentRow({ id, segment, index, canDelete, onChange, on
 
   function toggleType() {
     const newType = segment.type === 'work' ? 'rest' : 'work'
-    onChange(index, { ...segment, type: newType, label: newType === 'rest' ? undefined : segment.label })
+    onChange(index, { ...segment, type: newType })
   }
 
   function changeDuration(delta: number) {
@@ -139,26 +139,24 @@ export default function SegmentRow({ id, segment, index, canDelete, onChange, on
         }}>
           {segment.type === 'work' ? 'WORK' : 'REST'}
         </span>
-        {segment.type === 'work' ? (
-          <input
-            value={segment.label ?? ''}
-            onChange={e => onChange(index, { ...segment, label: e.target.value || undefined })}
-            onClick={e => e.stopPropagation()}
-            placeholder={PLACEHOLDERS[index % PLACEHOLDERS.length]}
-            style={{
-              width: '100%',
-              minWidth: 0,
-              background: 'none',
-              border: 'none',
-              outline: 'none',
-              color: C.text,
-              fontSize: 16,
-              fontWeight: 500,
-              fontFamily: 'inherit',
-              padding: 0,
-            }}
-          />
-        ) : null}
+        <input
+          value={segment.label ?? ''}
+          onChange={e => onChange(index, { ...segment, label: e.target.value || undefined })}
+          onClick={e => e.stopPropagation()}
+          placeholder={segment.type === 'work' ? PLACEHOLDERS[index % PLACEHOLDERS.length] : 'e.g. Rest'}
+          style={{
+            width: '100%',
+            minWidth: 0,
+            background: 'none',
+            border: 'none',
+            outline: 'none',
+            color: C.text,
+            fontSize: 16,
+            fontWeight: 500,
+            fontFamily: 'inherit',
+            padding: 0,
+          }}
+        />
       </div>
 
       {/* Duration controls */}
