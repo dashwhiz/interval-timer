@@ -6,6 +6,7 @@ import { formatTime } from '@/lib/utils'
 import { incrementCompletedSessions } from '@/lib/storage'
 import { trackEvent } from '@/lib/analytics'
 import { C } from '@/lib/colors'
+import S from '@/lib/strings'
 
 export default function CompleteClient() {
   const router = useRouter()
@@ -74,7 +75,7 @@ export default function CompleteClient() {
           cursor: 'pointer',
         }}
       >
-        DONE
+        {S.done}
       </button>
     </div>
   )

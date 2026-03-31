@@ -41,3 +41,40 @@ button:not(:disabled):active,
 [role="button"]:not(:disabled):active {
   filter: brightness(0.85);
 }
+
+/* Animated gradient border */
+@keyframes gradient-spin {
+  0%   { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.glow-border {
+  position: relative;
+  z-index: 0;
+}
+.glow-border::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #E8833A,
+    #27AE60,
+    #5B9BD5,
+    #F0AD4E,
+    #E8833A
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gradient-spin 3s linear infinite;
+  pointer-events: none;
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useSyncExternalStore } from 'react'
+import { useCallback, useState, useEffect, useSyncExternalStore } from 'react'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable'
 
@@ -20,12 +20,27 @@ import { PRESETS } from '@/lib/presets'
 import { getWorkoutsSnapshot, getWorkoutsServerSnapshot, subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot, reorderWorkouts } from '@/lib/storage'
 import { C } from '@/lib/colors'
 import { trackEvent } from '@/lib/analytics'
+import S from '@/lib/strings'
+
+const WELCOME_KEY = 'grind-welcome-seen'
 
 export default function HomePage() {
   const router = useRouter()
   const userWorkouts = useSyncExternalStore(subscribeWorkouts, getWorkoutsSnapshot, getWorkoutsServerSnapshot)
   const presetsOpen = useSyncExternalStore(subscribePresets, getPresetsSnapshot, getPresetsServerSnapshot)
   const completedSessions = useSyncExternalStore(subscribeWorkouts, getCompletedSessionsSnapshot, getCompletedSessionsServerSnapshot)
+
+  const [showWelcome, setShowWelcome] = useState(false)
+
+  // Check on mount if user has seen the welcome popup — must use effect for SSR safety
+  useEffect(() => {
+    if (!localStorage.getItem(WELCOME_KEY)) setShowWelcome(true) // eslint-disable-line react-hooks/set-state-in-effect
+  }, [])
+
+  function dismissWelcome() {
+    localStorage.setItem(WELCOME_KEY, '1')
+    setShowWelcome(false)
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -62,14 +77,15 @@ export default function HomePage() {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
           <GrindLogo />
           <button
+            className="glow-border"
             onClick={() => router.push('/config')}
             style={{
               width: 40,
               height: 40,
-              background: C.green,
-              border: 'none',
+              background: C.surface,
+              border: `1px solid ${C.border}`,
               borderRadius: 12,
-              color: '#fff',
+              color: C.text,
               fontSize: 22,
               cursor: 'pointer',
               display: 'flex',
@@ -77,7 +93,7 @@ export default function HomePage() {
               justifyContent: 'center',
               flexShrink: 0,
             }}
-            aria-label="New workout"
+            aria-label={S.ariaNewWorkout}
           >
             +
           </button>
@@ -86,7 +102,7 @@ export default function HomePage() {
         {/* Stats bar */}
         {completedSessions > 0 && (
           <div style={{ fontSize: 12, color: `${C.textMuted}88`, marginTop: 16 }}>
-            {completedSessions} session{completedSessions !== 1 ? 's' : ''} completed
+            {S.sessionsCompleted(completedSessions)}
           </div>
         )}
 
@@ -96,7 +112,7 @@ export default function HomePage() {
         {userWorkouts.length > 0 ? (
           <section style={{ marginBottom: 32 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted, letterSpacing: 0.5, marginBottom: 12 }}>
-              YOUR WORKOUTS
+              {S.yourWorkouts}
               <span style={{ fontWeight: 400, marginLeft: 8, fontSize: 12, color: C.orange }}>
                 {userWorkouts.length}
               </span>
@@ -133,10 +149,10 @@ export default function HomePage() {
               }}
             >
               <div style={{ fontSize: 15, fontWeight: 600, color: C.text, marginBottom: 6 }}>
-                Create your first workout
+                {S.createFirstWorkout}
               </div>
               <div style={{ fontSize: 13, color: C.textMuted }}>
-                Tap here or the + button to get started
+                {S.createFirstWorkoutSub}
               </div>
             </div>
           </section>
@@ -160,7 +176,7 @@ export default function HomePage() {
             }}
           >
             <span style={{ fontSize: 13, fontWeight: 600, color: C.textMuted, letterSpacing: 0.5 }}>
-              PRESETS
+              {S.presets}
             </span>
             <svg
               width="16"
@@ -193,7 +209,7 @@ export default function HomePage() {
         <div style={{ textAlign: 'center', marginTop: 'auto', paddingTop: 48 }}>
           <div style={{ width: 40, height: 1, background: C.border, margin: '0 auto 12px' }} />
           <div style={{ color: `${C.textMuted}44`, fontSize: 11, marginBottom: 6 }}>
-            © 2026 Grind
+            {S.copyright}
           </div>
           <button
             onClick={() => router.push('/legal')}
@@ -206,10 +222,63 @@ export default function HomePage() {
               padding: 0,
             }}
           >
-            Impressum & Privacy
+            {S.impressumLink}
           </button>
         </div>
       </div>
+
+      {/* Welcome popup */}
+      {showWelcome && (
+        <div
+          onClick={dismissWelcome}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.54)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 16,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 360,
+              width: '100%',
+              padding: 24,
+              background: C.surface,
+              borderRadius: 20,
+              border: `1px solid ${C.border}`,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            <div style={{ fontSize: 18, fontWeight: 700, color: C.text }}>{S.welcomeTitle}</div>
+            <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>
+              {S.welcomeBody}
+            </p>
+            <button
+              onClick={dismissWelcome}
+              style={{
+                height: 44,
+                background: C.green,
+                border: 'none',
+                borderRadius: 12,
+                color: '#fff',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                marginTop: 4,
+              }}
+            >
+              {S.welcomeBtn}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

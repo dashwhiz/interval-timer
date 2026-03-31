@@ -7,6 +7,7 @@ import ConfirmDialog from '@/components/ConfirmDialog'
 import { formatTime } from '@/lib/utils'
 import { setThemeColor } from '@/lib/theme-color'
 import { C } from '@/lib/colors'
+import S from '@/lib/strings'
 import type { Workout } from '@/lib/types'
 
 function PlayIcon({ size }: { size: number }) {
@@ -212,11 +213,11 @@ export default function TimerClient() {
           letterSpacing: 1,
           minHeight: 20,
         }}>
-          {round > 0 ? `ROUND ${round} / ${totalRounds}` : ''}
+          {round > 0 ? S.roundOf(round, totalRounds) : ''}
         </div>
         {nextLabel && (
           <div style={{ fontSize: 18, fontWeight: 500, color: textColor, opacity: 0.7, letterSpacing: 0.5 }}>
-            Next: {nextLabel}
+            {S.next(nextLabel)}
           </div>
         )}
       </div>
@@ -253,7 +254,7 @@ export default function TimerClient() {
       {/* Controls + next up */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-        <button style={circleBtn(56)} onClick={handleResetRequest} aria-label="Reset">
+        <button style={circleBtn(56)} onClick={handleResetRequest} aria-label={S.ariaReset}>
           <ResetIcon size={28} />
         </button>
 
@@ -261,14 +262,14 @@ export default function TimerClient() {
           style={circleBtn(72, status === 'finished')}
           disabled={status === 'finished'}
           onClick={() => status === 'running' ? pause() : play()}
-          aria-label={status === 'running' ? 'Pause' : 'Play'}
+          aria-label={status === 'running' ? S.ariaPause : S.ariaPlay}
         >
           {status === 'running'
             ? <PauseIcon size={40} />
             : <PlayIcon size={40} />}
         </button>
 
-        <button style={circleBtn(56)} onClick={handleStop} aria-label="Stop">
+        <button style={circleBtn(56)} onClick={handleStop} aria-label={S.ariaStop}>
           <StopIcon size={28} />
         </button>
       </div>
@@ -276,11 +277,11 @@ export default function TimerClient() {
 
       {showQuit && (
         <ConfirmDialog
-          title="Quit Workout?"
-          message="Your progress will be lost."
-          confirmLabel="Quit"
+          title={S.quitWorkoutTitle}
+          message={S.quitWorkoutMessage}
+          confirmLabel={S.quitBtn}
           confirmColor={C.red}
-          cancelLabel="Keep going"
+          cancelLabel={S.keepGoingBtn}
           onConfirm={handleQuitConfirm}
           onCancel={handleQuitCancel}
         />
@@ -288,11 +289,11 @@ export default function TimerClient() {
 
       {showReset && (
         <ConfirmDialog
-          title="Reset Workout?"
-          message="Timer will restart from the beginning."
-          confirmLabel="Reset"
+          title={S.resetWorkoutTitle}
+          message={S.resetWorkoutMessage}
+          confirmLabel={S.resetBtn}
           confirmColor={C.red}
-          cancelLabel="Continue"
+          cancelLabel={S.continueBtn}
           onConfirm={handleResetConfirm}
           onCancel={handleResetCancel}
         />

@@ -1,6 +1,7 @@
 'use client'
 
 import { C } from '@/lib/colors'
+import S from '@/lib/strings'
 
 interface Props {
   onClick?: () => void
@@ -16,7 +17,7 @@ export default function GrindLogo({ onClick }: Props) {
       </span>
       <div style={{ width: 36, height: 3, background: C.orange, borderRadius: 2 }} />
       <span style={{ fontSize: 11, fontWeight: 600, color: C.textMuted, letterSpacing: 1.5, marginTop: 2 }}>
-        INTERVAL TIMER
+        {S.appTagline}
       </span>
     </>
   )
@@ -33,7 +34,7 @@ export default function GrindLogo({ onClick }: Props) {
     return (
       <button
         onClick={onClick}
-        aria-label="Go home"
+        aria-label={S.ariaGoHome}
         style={{ ...baseStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
         {inner}

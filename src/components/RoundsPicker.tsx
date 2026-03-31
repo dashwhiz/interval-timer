@@ -1,6 +1,7 @@
 'use client'
 
 import { C } from '@/lib/colors'
+import S from '@/lib/strings'
 
 interface Props {
   value: number
@@ -33,7 +34,7 @@ export default function RoundsPicker({ value, onChange }: Props) {
   return (
     <div>
       <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5, marginBottom: 8 }}>
-        ROUNDS
+        {S.rounds}
       </div>
       <div style={{
         background: C.surface,
@@ -48,7 +49,7 @@ export default function RoundsPicker({ value, onChange }: Props) {
           style={btnStyle(atMin)}
           disabled={atMin}
           onClick={() => onChange(Math.max(MIN, value - 1))}
-          aria-label="Decrease rounds"
+          aria-label={S.ariaDecreaseRounds}
         >
           −
         </button>
@@ -66,7 +67,7 @@ export default function RoundsPicker({ value, onChange }: Props) {
           style={btnStyle(atMax)}
           disabled={atMax}
           onClick={() => onChange(Math.min(MAX, value + 1))}
-          aria-label="Increase rounds"
+          aria-label={S.ariaIncreaseRounds}
         >
           +
         </button>

@@ -16,6 +16,7 @@ import { PRESETS } from '@/lib/presets'
 import { initAudio } from '@/lib/audio'
 import { C } from '@/lib/colors'
 import { trackEvent } from '@/lib/analytics'
+import S from '@/lib/strings'
 import type { Workout, IntervalSegment } from '@/lib/types'
 
 function TimerIcon() {
@@ -242,7 +243,7 @@ export default function ConfigClient() {
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
-                aria-label="Duplicate workout"
+                aria-label={S.ariaDuplicateWorkout}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={C.textMuted}>
                   <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
@@ -264,7 +265,7 @@ export default function ConfigClient() {
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
-                aria-label="Share workout"
+                aria-label={S.ariaShareWorkout}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={C.textMuted}>
                   <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
@@ -272,12 +273,13 @@ export default function ConfigClient() {
               </button>
             )}
             <button
+              className="glow-border"
               onClick={handleStart}
               style={{
                 width: 40,
                 height: 40,
-                background: C.green,
-                border: 'none',
+                background: C.surface,
+                border: `1px solid ${C.border}`,
                 borderRadius: 12,
                 cursor: 'pointer',
                 display: 'flex',
@@ -285,9 +287,9 @@ export default function ConfigClient() {
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
-              aria-label="Start workout"
+              aria-label={S.ariaStartWorkout}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={C.text}>
                 <path d="M8 5v14l11-7z"/>
               </svg>
             </button>
@@ -301,7 +303,7 @@ export default function ConfigClient() {
             color: C.green,
             padding: '8px 0',
           }}>
-            Link copied!
+            {S.linkCopied}
           </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -311,7 +313,7 @@ export default function ConfigClient() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5 }}>
-                  WORKOUT NAME
+                  {S.workoutName}
                 </div>
                 {description && (
                   <button
@@ -321,7 +323,7 @@ export default function ConfigClient() {
                       background: 'none', color: C.textMuted, fontSize: 11, fontWeight: 700,
                       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
                     }}
-                    aria-label="Workout info"
+                    aria-label={S.ariaWorkoutInfo}
                   >
                     i
                   </button>
@@ -357,7 +359,7 @@ export default function ConfigClient() {
                     background: 'none', color: C.textMuted, fontSize: 13, fontWeight: 700,
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
                   }}
-                  aria-label="Workout info"
+                  aria-label={S.ariaWorkoutInfo}
                 >
                   i
                 </button>
@@ -370,7 +372,7 @@ export default function ConfigClient() {
           {/* Intervals */}
           <div>
             <div style={{ fontSize: 12, fontWeight: 500, color: C.textMuted, letterSpacing: 0.5, marginBottom: 8 }}>
-              INTERVALS
+              {S.intervals}
             </div>
             <DndContext id="segments-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={segmentIds} strategy={verticalListSortingStrategy}>
@@ -408,7 +410,7 @@ export default function ConfigClient() {
                 justifyContent: 'center',
               }}
             >
-              + ADD INTERVAL
+              {S.addInterval}
             </button>
           </div>
 
@@ -434,7 +436,7 @@ export default function ConfigClient() {
                 fontWeight: 600,
                 color: C.text,
               }}>
-                Total: {formatDuration(total)}
+                {S.total(formatDuration(total))}
               </span>
             </div>
 
@@ -462,20 +464,20 @@ export default function ConfigClient() {
                     </svg>
                   )}
                 </div>
-                <span style={{ fontSize: 14, color: C.text }}>Save to my workouts</span>
+                <span style={{ fontSize: 14, color: C.text }}>{S.saveToMyWorkouts}</span>
               </label>
             )}
 
             {/* Action buttons */}
             {mode === 'new' && (
               <button style={outlinedBtnStyle(!saveChecked)} disabled={!saveChecked} onClick={handleSaveOnly}>
-                SAVE ONLY
+                {S.saveOnly}
               </button>
             )}
 
             {mode === 'edit' && (
               <button style={outlinedBtnStyle(!hasChanges)} disabled={!hasChanges} onClick={handleUpdate}>
-                UPDATE
+                {S.update}
               </button>
             )}
 
@@ -494,7 +496,7 @@ export default function ConfigClient() {
                   letterSpacing: 0.3,
                 }}
               >
-                Delete workout
+                {S.deleteWorkout}
               </button>
             )}
           </div>
@@ -504,11 +506,11 @@ export default function ConfigClient() {
 
       {showDeleteConfirm && (
         <ConfirmDialog
-          title="Delete Workout?"
-          message={`"${name}" will be removed from your saved workouts.`}
-          confirmLabel="Delete"
+          title={S.deleteWorkoutTitle}
+          message={S.deleteWorkoutMessage(name)}
+          confirmLabel={S.deleteBtn}
           confirmColor={C.red}
-          cancelLabel="Keep"
+          cancelLabel={S.keepBtn}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setShowDeleteConfirm(false)}
         />
@@ -537,10 +539,10 @@ export default function ConfigClient() {
             border: `1px solid ${C.border}`,
           }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: C.text, margin: '0 0 6px' }}>
-              Unsaved Changes
+              {S.unsavedChangesTitle}
             </h2>
             <p style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.5, margin: 0 }}>
-              Save changes before starting?
+              {S.unsavedChangesMessage}
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 4, marginTop: 20 }}>
               <button
@@ -550,7 +552,7 @@ export default function ConfigClient() {
                   color: C.textMuted, fontSize: 13, fontWeight: 600, letterSpacing: 0.2, cursor: 'pointer',
                 }}
               >
-                Just start
+                {S.justStart}
               </button>
               <button
                 onClick={() => { setShowSaveBeforeStart(false); startWorkout(true) }}
@@ -559,7 +561,7 @@ export default function ConfigClient() {
                   color: C.green, fontSize: 13, fontWeight: 600, letterSpacing: 0.2, cursor: 'pointer',
                 }}
               >
-                Save & start
+                {S.saveAndStart}
               </button>
             </div>
           </div>
@@ -594,7 +596,7 @@ export default function ConfigClient() {
                 color: C.text, fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 4,
               }}
             >
-              Got it
+              {S.gotIt}
             </button>
           </div>
         </div>

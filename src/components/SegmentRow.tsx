@@ -5,6 +5,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { formatDuration } from '@/lib/utils'
 import { C } from '@/lib/colors'
+import S from '@/lib/strings'
 
 export type EditableSegment = { type: 'work' | 'rest'; durationSeconds: number; label?: string }
 
@@ -138,7 +139,7 @@ export default function SegmentRow({ id, segment, index, canDelete, onChange, on
           padding: '3px 8px',
           userSelect: 'none',
         }}>
-          {segment.type === 'work' ? 'WORK' : 'REST'}
+          {segment.type === 'work' ? S.work : S.rest}
         </span>
         <input
           value={segment.label ?? ''}
@@ -162,7 +163,7 @@ export default function SegmentRow({ id, segment, index, canDelete, onChange, on
 
       {/* Duration controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
-        <button style={smallBtn(atMin)} disabled={atMin} onClick={() => changeDuration(-STEP)} aria-label="Decrease">
+        <button style={smallBtn(atMin)} disabled={atMin} onClick={() => changeDuration(-STEP)} aria-label={S.ariaDecrease}>
           −
         </button>
         {editing ? (
@@ -209,7 +210,7 @@ export default function SegmentRow({ id, segment, index, canDelete, onChange, on
             {formatDuration(segment.durationSeconds)}
           </span>
         )}
-        <button style={smallBtn(atMax)} disabled={atMax} onClick={() => changeDuration(STEP)} aria-label="Increase">
+        <button style={smallBtn(atMax)} disabled={atMax} onClick={() => changeDuration(STEP)} aria-label={S.ariaIncrease}>
           +
         </button>
       </div>
@@ -235,7 +236,7 @@ export default function SegmentRow({ id, segment, index, canDelete, onChange, on
           flexShrink: 0,
           padding: 0,
         }}
-        aria-label="Remove interval"
+        aria-label={S.ariaRemoveInterval}
       >
         ×
       </button>

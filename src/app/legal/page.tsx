@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import GrindLogo from '@/components/GrindLogo'
 import ConfirmDialog from '@/components/ConfirmDialog'
 import { C } from '@/lib/colors'
+import S from '@/lib/strings'
 
 export default function LegalPage() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function LegalPage() {
           <GrindLogo onClick={() => router.push('/')} />
         </div>
 
-        <h2 style={h2}>Impressum</h2>
+        <h2 style={h2}>{S.impressum}</h2>
         <p style={p}>
           Aleksandar Velichkovikj<br />
           Email: <a href="mailto:dashwhiz@gmail.com" style={{ color: C.green, textDecoration: 'none' }}>dashwhiz@gmail.com</a>
@@ -55,37 +56,25 @@ export default function LegalPage() {
             LinkedIn
           </a>
         </div>
-        <p style={p}>
-          This is a personal, non-commercial project built with love and effort
-          to make interval training easier — after not finding what I wanted on the market for free.
-        </p>
+        <p style={p}>{S.personalProject}</p>
+        <p style={p}>{S.feedbackWelcome}</p>
 
-        <h2 style={h2}>Privacy Policy</h2>
+        <h2 style={h2}>{S.privacyPolicy}</h2>
+        <p style={p}>{S.privacyIntro}</p>
         <p style={p}>
-          Grind takes your privacy seriously. Here is what you need to know:
+          <strong style={{ color: C.text }}>Anonymous analytics.</strong> {S.privacyAnalytics}
         </p>
         <p style={p}>
-          <strong style={{ color: C.text }}>Anonymous analytics.</strong> This app uses Google Analytics 4 to
-          collect anonymous usage data such as page views, country of origin, and general device information.
-          IP addresses are anonymized and no personally identifiable information is collected or stored.
-          No advertising features are enabled. You can opt out by using a browser extension or
-          disabling JavaScript.
+          <strong style={{ color: C.text }}>Local storage only.</strong> {S.privacyStorage}
         </p>
         <p style={p}>
-          <strong style={{ color: C.text }}>Local storage only.</strong> Your workouts and preferences are
-          stored exclusively in your browser's local storage on your device. This data never leaves your device.
+          <strong style={{ color: C.text }}>No accounts.</strong> {S.privacyNoAccounts}
         </p>
         <p style={p}>
-          <strong style={{ color: C.text }}>No accounts.</strong> There is no user registration, login,
-          or personal data collection of any kind.
+          <strong style={{ color: C.text }}>Sharing.</strong> {S.privacySharing}
         </p>
         <p style={p}>
-          <strong style={{ color: C.text }}>Sharing.</strong> If you choose to share a workout via link,
-          the workout data is encoded in the URL itself. No data is stored on any server.
-        </p>
-        <p style={p}>
-          <strong style={{ color: C.text }}>Your rights.</strong> Since all data is stored locally on your device,
-          you have full control. You can clear your data at any time using the button below.
+          <strong style={{ color: C.text }}>Your rights.</strong> {S.privacyRights}
         </p>
 
         <button
@@ -103,21 +92,21 @@ export default function LegalPage() {
             cursor: !hasData ? 'default' : 'pointer',
           }}
         >
-          {!hasData ? 'No data stored' : 'Delete all my data'}
+          {!hasData ? S.noDataStored : S.deleteAllMyData}
         </button>
 
         <p style={{ ...p, marginTop: 24, color: `${C.textMuted}88` }}>
-          Last updated: March 2026
+          {S.lastUpdated}
         </p>
       </div>
 
       {showPurge && (
         <ConfirmDialog
-          title="Delete all data?"
-          message="This will remove all your saved workouts, preferences, and session history. This cannot be undone."
-          confirmLabel="Delete everything"
+          title={S.deleteAllDataTitle}
+          message={S.deleteAllDataMessage}
+          confirmLabel={S.deleteEverything}
           confirmColor={C.red}
-          cancelLabel="Cancel"
+          cancelLabel={S.cancel}
           onConfirm={() => {
             localStorage.clear()
             sessionStorage.clear()
