@@ -30,13 +30,46 @@ export function fullSequence(workout: Workout): IntervalSegment[] {
   return seq
 }
 
+/**
+ * Compact share format: name|rounds|prep|w30:Label,r15,w45
+ * Segments: w/r + duration in seconds, optional :Label
+ */
 export function encodeWorkout(workout: Workout): string {
-  return encodeURIComponent(JSON.stringify(workout))
+  const segs = workout.segments
+    .filter(s => s.type !== 'prepare')
+    .map(s => {
+      const prefix = s.type === 'work' ? 'w' : 'r'
+      const label = s.label ? `:${s.label}` : ''
+      return `${prefix}${s.durationSeconds}${label}`
+    })
+    .join(',')
+  const parts = [workout.name, workout.rounds, workout.prepareSeconds, segs]
+  return encodeURIComponent(parts.join('|'))
 }
 
 export function decodeWorkout(param: string): Workout | null {
   try {
-    return JSON.parse(decodeURIComponent(param)) as Workout
+    const raw = decodeURIComponent(param)
+    // Legacy JSON format
+    if (raw.startsWith('{')) return JSON.parse(raw) as Workout
+    // Compact format
+    const [name, roundsStr, prepStr, segsStr] = raw.split('|')
+    if (!name || !roundsStr || !prepStr || !segsStr) return null
+    const segments: IntervalSegment[] = segsStr.split(',').map(s => {
+      const type = s[0] === 'w' ? 'work' : 'rest'
+      const rest = s.slice(1)
+      const colonIdx = rest.indexOf(':')
+      const durationSeconds = parseInt(colonIdx >= 0 ? rest.slice(0, colonIdx) : rest)
+      const label = colonIdx >= 0 ? rest.slice(colonIdx + 1) : undefined
+      return { type, durationSeconds, ...(label ? { label } : {}) } as IntervalSegment
+    })
+    return {
+      name,
+      type: 'custom',
+      segments,
+      rounds: parseInt(roundsStr),
+      prepareSeconds: parseInt(prepStr),
+    }
   } catch {
     return null
   }
