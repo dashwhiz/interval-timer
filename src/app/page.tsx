@@ -13,6 +13,7 @@ function subscribePresets(cb: () => void) {
 }
 import type React from 'react'
 import GrindLogo from '@/components/GrindLogo'
+import Tooltip from '@/components/Tooltip'
 import { useRouter } from 'next/navigation'
 import PresetCard from '@/components/PresetCard'
 import SortableWorkoutCard from '@/components/SortableWorkoutCard'
@@ -76,27 +77,29 @@ export default function HomePage() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
           <GrindLogo />
-          <button
-            className="glow-border"
-            onClick={() => router.push('/config')}
-            style={{
-              width: 40,
-              height: 40,
-              background: C.surface,
-              border: `1px solid ${C.border}`,
-              borderRadius: 12,
-              color: C.text,
-              fontSize: 22,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-            aria-label={S.ariaNewWorkout}
-          >
-            +
-          </button>
+          <Tooltip label={S.tipNewWorkout}>
+            <button
+              className="glow-border"
+              onClick={() => router.push('/config')}
+              style={{
+                width: 40,
+                height: 40,
+                background: C.surface,
+                border: `1px solid ${C.border}`,
+                borderRadius: 12,
+                color: C.text,
+                fontSize: 22,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+              aria-label={S.ariaNewWorkout}
+            >
+              +
+            </button>
+          </Tooltip>
         </div>
 
         {/* Stats bar */}

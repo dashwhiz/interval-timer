@@ -8,6 +8,7 @@ import { formatTime } from '@/lib/utils'
 import { setThemeColor } from '@/lib/theme-color'
 import { C } from '@/lib/colors'
 import S from '@/lib/strings'
+import Tooltip from '@/components/Tooltip'
 import type { Workout } from '@/lib/types'
 
 function PlayIcon({ size }: { size: number }) {
@@ -254,24 +255,30 @@ export default function TimerClient() {
       {/* Controls + next up */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-        <button style={circleBtn(56)} onClick={handleResetRequest} aria-label={S.ariaReset}>
-          <ResetIcon size={28} />
-        </button>
+        <Tooltip label={S.tipReset} position="top">
+          <button style={circleBtn(56)} onClick={handleResetRequest} aria-label={S.ariaReset}>
+            <ResetIcon size={28} />
+          </button>
+        </Tooltip>
 
-        <button
-          style={circleBtn(72, status === 'finished')}
-          disabled={status === 'finished'}
-          onClick={() => status === 'running' ? pause() : play()}
-          aria-label={status === 'running' ? S.ariaPause : S.ariaPlay}
-        >
-          {status === 'running'
-            ? <PauseIcon size={40} />
-            : <PlayIcon size={40} />}
-        </button>
+        <Tooltip label={status === 'running' ? S.tipPause : S.tipPlay} position="top">
+          <button
+            style={circleBtn(72, status === 'finished')}
+            disabled={status === 'finished'}
+            onClick={() => status === 'running' ? pause() : play()}
+            aria-label={status === 'running' ? S.ariaPause : S.ariaPlay}
+          >
+            {status === 'running'
+              ? <PauseIcon size={40} />
+              : <PlayIcon size={40} />}
+          </button>
+        </Tooltip>
 
-        <button style={circleBtn(56)} onClick={handleStop} aria-label={S.ariaStop}>
-          <StopIcon size={28} />
-        </button>
+        <Tooltip label={S.tipStop} position="top">
+          <button style={circleBtn(56)} onClick={handleStop} aria-label={S.ariaStop}>
+            <StopIcon size={28} />
+          </button>
+        </Tooltip>
       </div>
       </div>
 

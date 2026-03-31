@@ -84,6 +84,17 @@ const S = {
   welcomeBody: 'Build custom interval timers for HIIT, Tabata, CrossFit, or any workout.\n\nTap + to create your first workout, or pick a preset to get started. During a workout, tap the screen to pause or resume.\n\nShare any workout via link — perfect for coaches sending programs to clients remotely.\n\nAll your data stays on your device — no account needed.',
   welcomeBtn: 'Got it',
 
+  // Tooltips
+  tipNewWorkout: 'New workout',
+  tipStartWorkout: 'Start workout',
+  tipDuplicate: 'Duplicate',
+  tipShare: 'Share',
+  tipReset: 'Reset',
+  tipPause: 'Pause',
+  tipPlay: 'Play',
+  tipStop: 'Stop',
+  tipInfo: 'Info',
+
   // Aria labels
   ariaNewWorkout: 'New workout',
   ariaStartWorkout: 'Start workout',
