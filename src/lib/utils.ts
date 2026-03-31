@@ -32,9 +32,11 @@ export function fullSequence(workout: Workout): IntervalSegment[] {
 
 /**
  * Compact share format: name|rounds|prep|w30:Label,r15,w45
- * Segments: w/r + duration in seconds, optional :Label
+ * Then deflate-compressed + base64url-encoded for shorter URLs.
+ * Falls back to uncompressed compact format if CompressionStream unavailable.
  */
-export function encodeWorkout(workout: Workout): string {
+
+function toCompact(workout: Workout): string {
   const segs = workout.segments
     .filter(s => s.type !== 'prepare')
     .map(s => {
@@ -43,33 +45,80 @@ export function encodeWorkout(workout: Workout): string {
       return `${prefix}${s.durationSeconds}${label}`
     })
     .join(',')
-  const parts = [workout.name, workout.rounds, workout.prepareSeconds, segs]
-  return encodeURIComponent(parts.join('|'))
+  return [workout.name, workout.rounds, workout.prepareSeconds, segs].join('|')
 }
 
-export function decodeWorkout(param: string): Workout | null {
+function fromCompact(raw: string): Workout | null {
+  const [name, roundsStr, prepStr, segsStr] = raw.split('|')
+  if (!name || !roundsStr || !prepStr || !segsStr) return null
+  const segments: IntervalSegment[] = segsStr.split(',').map(s => {
+    const type = s[0] === 'w' ? 'work' : 'rest'
+    const rest = s.slice(1)
+    const colonIdx = rest.indexOf(':')
+    const durationSeconds = parseInt(colonIdx >= 0 ? rest.slice(0, colonIdx) : rest)
+    const label = colonIdx >= 0 ? rest.slice(colonIdx + 1) : undefined
+    return { type, durationSeconds, ...(label ? { label } : {}) } as IntervalSegment
+  })
+  return {
+    name,
+    type: 'custom',
+    segments,
+    rounds: parseInt(roundsStr),
+    prepareSeconds: parseInt(prepStr),
+  }
+}
+
+// Base64url helpers (no padding, URL-safe)
+function toBase64url(bytes: Uint8Array): string {
+  let binary = ''
+  for (const b of bytes) binary += String.fromCharCode(b)
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function fromBase64url(str: string): Uint8Array {
+  const padded = str.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - (str.length % 4)) % 4)
+  const binary = atob(padded)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
+
+async function compress(input: string): Promise<Uint8Array> {
+  const encoder = new TextEncoder()
+  const blob = new Blob([encoder.encode(input)])
+  const stream = blob.stream().pipeThrough(new CompressionStream('deflate-raw'))
+  return new Uint8Array(await new Response(stream).arrayBuffer())
+}
+
+async function decompress(bytes: Uint8Array): Promise<string> {
+  const blob = new Blob([bytes as BlobPart])
+  const stream = blob.stream().pipeThrough(new DecompressionStream('deflate-raw'))
+  return new Response(stream).text()
+}
+
+export async function encodeWorkout(workout: Workout): Promise<string> {
+  const compact = toCompact(workout)
   try {
+    const compressed = await compress(compact)
+    return 'z.' + toBase64url(compressed)
+  } catch {
+    return encodeURIComponent(compact)
+  }
+}
+
+export async function decodeWorkout(param: string): Promise<Workout | null> {
+  try {
+    // Compressed format (z. prefix)
+    if (param.startsWith('z.')) {
+      const bytes = fromBase64url(param.slice(2))
+      const compact = await decompress(bytes)
+      return fromCompact(compact)
+    }
     const raw = decodeURIComponent(param)
     // Legacy JSON format
     if (raw.startsWith('{')) return JSON.parse(raw) as Workout
-    // Compact format
-    const [name, roundsStr, prepStr, segsStr] = raw.split('|')
-    if (!name || !roundsStr || !prepStr || !segsStr) return null
-    const segments: IntervalSegment[] = segsStr.split(',').map(s => {
-      const type = s[0] === 'w' ? 'work' : 'rest'
-      const rest = s.slice(1)
-      const colonIdx = rest.indexOf(':')
-      const durationSeconds = parseInt(colonIdx >= 0 ? rest.slice(0, colonIdx) : rest)
-      const label = colonIdx >= 0 ? rest.slice(colonIdx + 1) : undefined
-      return { type, durationSeconds, ...(label ? { label } : {}) } as IntervalSegment
-    })
-    return {
-      name,
-      type: 'custom',
-      segments,
-      rounds: parseInt(roundsStr),
-      prepareSeconds: parseInt(prepStr),
-    }
+    // Uncompressed compact format
+    return fromCompact(raw)
   } catch {
     return null
   }

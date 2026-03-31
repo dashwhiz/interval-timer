@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef, useCallback, useSyncExternalStore } from 'react'
+import { useState, useMemo, useRef, useCallback, useEffect, useSyncExternalStore } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
@@ -40,27 +40,25 @@ function normalizeSegments(segments: IntervalSegment[]): EditableSegment[] {
   return result.length > 0 ? result : DEFAULT_SEGMENTS
 }
 
-function resolveWorkout(searchParams: URLSearchParams, userWorkouts: Workout[]): { workout: Workout | null; editIndex: number | null } {
+function resolveWorkoutSync(searchParams: URLSearchParams, userWorkouts: Workout[]): { workout: Workout | null; editIndex: number | null; needsAsync: boolean } {
   const editParam = searchParams.get('edit')
   const presetParam = searchParams.get('preset')
 
   if (editParam !== null) {
     const idx = parseInt(editParam)
-    return { workout: userWorkouts[idx] ?? null, editIndex: idx }
+    return { workout: userWorkouts[idx] ?? null, editIndex: idx, needsAsync: false }
   }
 
   if (presetParam !== null) {
     const idx = parseInt(presetParam)
-    return { workout: PRESETS[idx] ?? null, editIndex: null }
+    return { workout: PRESETS[idx] ?? null, editIndex: null, needsAsync: false }
   }
 
-  const shareParam = searchParams.get('share')
-  if (shareParam !== null) {
-    const workout = decodeWorkout(shareParam)
-    return { workout, editIndex: null }
+  if (searchParams.get('share') !== null) {
+    return { workout: null, editIndex: null, needsAsync: true }
   }
 
-  return { workout: null, editIndex: null }
+  return { workout: null, editIndex: null, needsAsync: false }
 }
 
 export default function ConfigClient() {
@@ -68,8 +66,28 @@ export default function ConfigClient() {
   const searchParams = useSearchParams()
   const userWorkouts = useSyncExternalStore(subscribeWorkouts, getWorkoutsSnapshot, getWorkoutsServerSnapshot)
 
-  const { workout: passedWorkout, editIndex } = resolveWorkout(searchParams, userWorkouts)
+  const { workout: syncWorkout, editIndex, needsAsync } = resolveWorkoutSync(searchParams, userWorkouts)
   const isShare = searchParams.get('share') !== null
+  const [sharedWorkout, setSharedWorkout] = useState<Workout | null>(null)
+  const [shareLoading, setShareLoading] = useState(needsAsync)
+
+  useEffect(() => {
+    const shareParam = searchParams.get('share')
+    if (!shareParam) return
+    decodeWorkout(shareParam).then(w => {
+      setSharedWorkout(w)
+      if (w) {
+        setName(w.name)
+        const segs = normalizeSegments(w.segments)
+        setSegments(segs)
+        setSegmentIds(segs.map((_, i) => `seg-${i + 1}`))
+        setRounds(w.rounds)
+      }
+      setShareLoading(false)
+    })
+  }, [searchParams])
+
+  const passedWorkout = isShare ? sharedWorkout : syncWorkout
   const mode: 'new' | 'edit' | 'preset' = !passedWorkout ? 'new' : isShare ? 'new' : editIndex !== null ? 'edit' : 'preset'
 
   const initialSegments = passedWorkout ? normalizeSegments(passedWorkout.segments) : DEFAULT_SEGMENTS
@@ -176,7 +194,8 @@ export default function ConfigClient() {
   async function handleShare() {
     const workout = buildWorkoutFromState()
     const base = window.location.pathname.replace(/\/config.*$/, '')
-    const url = `${window.location.origin}${base}/config?share=${encodeWorkout(workout)}`
+    const encoded = await encodeWorkout(workout)
+    const url = `${window.location.origin}${base}/config?share=${encoded}`
     trackEvent('workout_shared', { workout_name: workout.name })
 
     if (navigator.share) {
@@ -206,6 +225,10 @@ export default function ConfigClient() {
     const id = `seg-${nextId.current++}`
     setSegments(prev => [...prev, { type: 'work', durationSeconds: 30 }])
     setSegmentIds(prev => [...prev, id])
+  }
+
+  if (shareLoading) {
+    return <div className="full-screen" style={{ background: C.bg }} />
   }
 
   const outlinedBtnStyle = (disabled: boolean): React.CSSProperties => ({
